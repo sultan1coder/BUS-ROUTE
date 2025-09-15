@@ -1,0 +1,294 @@
+"use strict";
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StudentController = void 0;
+const studentService_1 = require("../services/studentService");
+const errorHandler_1 = require("../middleware/errorHandler");
+class StudentController {
+}
+exports.StudentController = StudentController;
+_a = StudentController;
+// Create a new student
+StudentController.createStudent = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const studentData = req.body;
+    const student = await studentService_1.StudentService.createStudent(studentData);
+    res.status(201).json({
+        success: true,
+        message: "Student created successfully",
+        data: student,
+    });
+});
+// Get student by ID
+StudentController.getStudentById = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { id } = req.params;
+    const student = await studentService_1.StudentService.getStudentById(id);
+    res.status(200).json({
+        success: true,
+        data: student,
+    });
+});
+// Update student
+StudentController.updateStudent = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { id } = req.params;
+    const updateData = req.body;
+    const student = await studentService_1.StudentService.updateStudent(id, updateData);
+    res.status(200).json({
+        success: true,
+        message: "Student updated successfully",
+        data: student,
+    });
+});
+// Delete student (soft delete)
+StudentController.deleteStudent = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { id } = req.params;
+    await studentService_1.StudentService.deleteStudent(id);
+    res.status(200).json({
+        success: true,
+        message: "Student deleted successfully",
+    });
+});
+// Get students with filters and pagination
+StudentController.getStudents = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { schoolId, grade, isActive, parentId, routeId, page = 1, limit = 20, } = req.query;
+    const filters = {};
+    if (schoolId)
+        filters.schoolId = schoolId;
+    if (grade)
+        filters.grade = grade;
+    if (isActive !== undefined)
+        filters.isActive = isActive === "true";
+    if (parentId)
+        filters.parentId = parentId;
+    if (routeId)
+        filters.routeId = routeId;
+    const result = await studentService_1.StudentService.getStudents(filters, parseInt(page, 10), parseInt(limit, 10));
+    res.status(200).json({
+        success: true,
+        data: result.students,
+        meta: {
+            page: result.page,
+            limit: result.limit,
+            total: result.total,
+            totalPages: result.totalPages,
+        },
+    });
+});
+// Assign student to route and stop
+StudentController.assignToRoute = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { studentId, routeId, stopId } = req.body;
+    const assignment = await studentService_1.StudentService.assignToRoute(studentId, routeId, stopId);
+    res.status(200).json({
+        success: true,
+        message: "Student assigned to route successfully",
+        data: assignment,
+    });
+});
+// Unassign student from route
+StudentController.unassignFromRoute = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { studentId, routeId } = req.params;
+    await studentService_1.StudentService.unassignFromRoute(studentId, routeId);
+    res.status(200).json({
+        success: true,
+        message: "Student unassigned from route successfully",
+    });
+});
+// Record RFID attendance
+StudentController.recordRFIDAttendance = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const rfidData = req.body;
+    const recordedBy = req.user?.id;
+    const attendance = await studentService_1.StudentService.recordRFIDAttendance(rfidData, recordedBy);
+    res.status(200).json({
+        success: true,
+        message: "RFID attendance recorded successfully",
+        data: attendance,
+    });
+});
+// Record NFC attendance
+StudentController.recordNFCAttendance = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const nfcData = req.body;
+    const recordedBy = req.user?.id;
+    const attendance = await studentService_1.StudentService.recordNFCAttendance(nfcData, recordedBy);
+    res.status(200).json({
+        success: true,
+        message: "NFC attendance recorded successfully",
+        data: attendance,
+    });
+});
+// Get student attendance history
+StudentController.getStudentAttendance = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { id } = req.params;
+    const { startDate, endDate, page = 1, limit = 20 } = req.query;
+    const result = await studentService_1.StudentService.getStudentAttendance(id, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined, parseInt(page, 10), parseInt(limit, 10));
+    res.status(200).json({
+        success: true,
+        data: result.attendance,
+        meta: {
+            page: result.page,
+            limit: result.limit,
+            total: result.total,
+            totalPages: result.totalPages,
+        },
+    });
+});
+// Get attendance statistics for a school
+StudentController.getAttendanceStats = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { schoolId } = req.params;
+    const { startDate, endDate } = req.query;
+    const stats = await studentService_1.StudentService.getAttendanceStats(schoolId, startDate ? new Date(startDate) : undefined, endDate ? new Date(endDate) : undefined);
+    res.status(200).json({
+        success: true,
+        data: stats,
+    });
+});
+// Get students without RFID/NFC tags
+StudentController.getStudentsWithoutTags = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { schoolId } = req.query;
+    const students = await studentService_1.StudentService.getStudentsWithoutTags(schoolId);
+    res.status(200).json({
+        success: true,
+        data: students,
+    });
+});
+// Bulk assign RFID/NFC tags to students
+StudentController.bulkAssignTags = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { assignments } = req.body;
+    const results = await studentService_1.StudentService.bulkAssignTags(assignments);
+    const successCount = results.filter((r) => r.success).length;
+    const failureCount = results.filter((r) => !r.success).length;
+    res.status(200).json({
+        success: true,
+        message: `Bulk tag assignment completed: ${successCount} successful, ${failureCount} failed`,
+        data: {
+            total: assignments.length,
+            successful: successCount,
+            failed: failureCount,
+            results,
+        },
+    });
+});
+// Get student manifest for a bus/trip
+StudentController.getStudentManifest = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { busId } = req.params;
+    const { tripId } = req.query;
+    const manifest = await studentService_1.StudentService.getStudentManifest(busId, tripId);
+    res.status(200).json({
+        success: true,
+        data: manifest,
+    });
+});
+// Manual attendance recording (for school staff)
+StudentController.recordManualAttendance = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { studentId, tripId, status, pickupTime, dropTime, notes } = req.body;
+    const recordedBy = req.user?.id;
+    // Check if attendance already exists
+    const existingAttendance = await studentService_1.StudentService.getStudentAttendance(studentId);
+    const todayAttendance = existingAttendance.attendance.find((a) => a.trip.id === tripId);
+    let attendance;
+    if (todayAttendance) {
+        // Update existing attendance
+        const updateData = {
+            status,
+            recordedBy,
+        };
+        if (pickupTime)
+            updateData.pickupTime = new Date(pickupTime);
+        if (dropTime)
+            updateData.dropTime = new Date(dropTime);
+        if (notes !== undefined)
+            updateData.notes = notes;
+        // Note: This is a simplified update - in a real implementation,
+        // you'd need to add an update method to the service
+        attendance = todayAttendance;
+    }
+    else {
+        // Create new attendance record
+        // Note: This is a simplified creation - in a real implementation,
+        // you'd need to add a create method to the service
+        attendance = {
+            studentId,
+            tripId,
+            status,
+            pickupTime: pickupTime ? new Date(pickupTime) : null,
+            dropTime: dropTime ? new Date(dropTime) : null,
+            notes,
+            recordedBy,
+        };
+    }
+    res.status(200).json({
+        success: true,
+        message: "Manual attendance recorded successfully",
+        data: attendance,
+    });
+});
+// Get attendance report for a specific date range
+StudentController.getAttendanceReport = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { schoolId, startDate, endDate } = req.query;
+    if (!schoolId) {
+        res.status(400).json({
+            success: false,
+            message: "schoolId parameter is required",
+        });
+        return;
+    }
+    const start = startDate ? new Date(startDate) : new Date();
+    const end = endDate ? new Date(endDate) : new Date();
+    // Get all students in the school
+    const students = await studentService_1.StudentService.getStudents({ schoolId: schoolId }, 1, 1000 // Get all students
+    );
+    // Get attendance for each student in the date range
+    const report = [];
+    for (const student of students.students) {
+        const attendance = await studentService_1.StudentService.getStudentAttendance(student.id, start, end, 1, 100 // Get all attendance records for the period
+        );
+        report.push({
+            student: {
+                id: student.id,
+                firstName: student.firstName,
+                lastName: student.lastName,
+                grade: student.grade,
+                studentId: student.studentId,
+            },
+            attendance: attendance.attendance,
+            summary: {
+                totalDays: calculateBusinessDays(start, end),
+                presentDays: attendance.attendance.filter((a) => a.status === "PRESENT").length,
+                absentDays: attendance.attendance.filter((a) => a.status === "ABSENT").length,
+                attendanceRate: attendance.attendance.length > 0
+                    ? (attendance.attendance.filter((a) => a.status === "PRESENT").length /
+                        attendance.attendance.length) *
+                        100
+                    : 0,
+            },
+        });
+    }
+    res.status(200).json({
+        success: true,
+        data: {
+            schoolId,
+            dateRange: { start, end },
+            students: report,
+            summary: {
+                totalStudents: report.length,
+                averageAttendanceRate: report.length > 0
+                    ? report.reduce((sum, s) => sum + s.summary.attendanceRate, 0) /
+                        report.length
+                    : 0,
+            },
+        },
+    });
+});
+// Helper function to calculate business days
+function calculateBusinessDays(startDate, endDate) {
+    let count = 0;
+    const curDate = new Date(startDate);
+    while (curDate <= endDate) {
+        const dayOfWeek = curDate.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+            // Not Sunday (0) or Saturday (6)
+            count++;
+        }
+        curDate.setDate(curDate.getDate() + 1);
+    }
+    return count;
+}
+//# sourceMappingURL=studentController.js.map

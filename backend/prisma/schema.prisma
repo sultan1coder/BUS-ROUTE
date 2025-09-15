@@ -1,0 +1,520 @@
+// School Bus Tracking and Management System Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User roles enum
+enum UserRole {
+  ADMIN
+  SCHOOL_STAFF
+  DRIVER
+  PARENT
+}
+
+// Notification types
+enum NotificationType {
+  LOCATION_UPDATE
+  ETA_ALERT
+  SPEED_ALERT
+  EMERGENCY
+  DELAY
+  ARRIVAL
+  DEPARTURE
+  ABSENCE
+  GENERAL
+}
+
+// Message types
+enum MessageType {
+  TEXT
+  IMAGE
+  EMERGENCY
+}
+
+// Trip status
+enum TripStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DELAYED
+}
+
+// Alert severity
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// Attendance status
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  NOT_RECORDED
+}
+
+// User model - handles authentication for all user types
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  password    String
+  role        UserRole
+  firstName   String
+  lastName    String
+  phone       String?
+  avatar      String?
+  isActive    Boolean  @default(true)
+  lastLogin   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  schoolStaff SchoolStaff?
+  driver      Driver?
+  parent      Parent?
+
+  // Notifications sent to this user
+  notifications Notification[]
+
+  // Notification preferences
+  notificationPreferences NotificationPreferences?
+
+  // Messages sent by this user
+  sentMessages Message[] @relation("MessageSender")
+
+  // Messages received by this user
+  receivedMessages Message[] @relation("MessageReceiver")
+
+  @@map("users")
+}
+
+// School model
+model School {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  country     String   @default("US")
+  phone       String?
+  email       String?
+  latitude    Float?
+  longitude   Float?
+  timezone    String   @default("America/New_York")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  staff       SchoolStaff[]
+  buses       Bus[]
+  routes      Route[]
+  students    Student[]
+
+  @@map("schools")
+}
+
+// School staff model
+model SchoolStaff {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  schoolId    String
+  position    String
+  department  String?
+  permissions Json?    // JSON object defining specific permissions
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("school_staff")
+}
+
+// Driver model
+model Driver {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  licenseNumber     String   @unique
+  licenseExpiry     DateTime
+  licenseType       String
+  experienceYears   Int      @default(0)
+  rating            Float?   @default(5.0)
+  emergencyContact  String
+  emergencyPhone    String
+  medicalInfo       String?  // JSON string for medical conditions/allergies
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bus               Bus?
+  trips             Trip[]
+  performance       DriverPerformance[]
+  emergencyAlerts   EmergencyAlert[]
+  speedViolations   SpeedViolation[]
+
+  @@map("drivers")
+}
+
+// Bus model
+model Bus {
+  id              String   @id @default(cuid())
+  plateNumber     String   @unique
+  capacity        Int
+  model           String
+  year            Int
+  color           String
+  schoolId        String
+  driverId        String?  @unique
+  isActive        Boolean  @default(true)
+  gpsDeviceId     String?  @unique
+  lastMaintenance DateTime?
+  nextMaintenance DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  school          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  driver          Driver?  @relation(fields: [driverId], references: [id])
+  routes          Route[]
+  trips           Trip[]
+  trackingData    GPSTracking[]
+  geofences       Geofence[]
+  emergencyAlerts EmergencyAlert[]
+  speedViolations SpeedViolation[]
+
+  @@map("buses")
+}
+
+// Route model
+model Route {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  schoolId    String
+  busId       String?  @unique
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  school      School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  bus         Bus?        @relation(fields: [busId], references: [id])
+  stops       RouteStop[]
+  trips       Trip[]
+  assignments StudentRouteAssignment[]
+
+  @@map("routes")
+}
+
+// Route stop model
+model RouteStop {
+  id          String   @id @default(cuid())
+  routeId     String
+  name        String
+  address     String
+  latitude    Float
+  longitude   Float
+  sequence    Int      // Order in the route
+  pickupTime  String?  // Expected pickup time (HH:MM format)
+  dropTime    String?  // Expected drop time (HH:MM format)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  route       Route      @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  assignments StudentRouteAssignment[]
+
+  @@map("route_stops")
+}
+
+// Student model
+model Student {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime
+  grade       String
+  studentId   String   @unique // School's student ID
+  rfidTag     String?  @unique
+  nfcTag      String?  @unique
+  schoolId    String
+  parentId    String?
+  photo       String?
+  medicalInfo String?  // JSON string for allergies, medications, etc.
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  parent      Parent?   @relation(fields: [parentId], references: [id])
+  assignments StudentRouteAssignment[]
+  attendance  Attendance[]
+
+  @@map("students")
+}
+
+// Parent model
+model Parent {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  relationship String  // mother, father, guardian, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students    Student[]
+
+  @@map("parents")
+}
+
+// Student route assignment
+model StudentRouteAssignment {
+  id         String   @id @default(cuid())
+  studentId  String
+  routeId    String
+  stopId     String
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  student    Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  route      Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  stop       RouteStop @relation(fields: [stopId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, routeId])
+  @@map("student_route_assignments")
+}
+
+// GPS Tracking model
+model GPSTracking {
+  id          String   @id @default(cuid())
+  busId       String
+  latitude    Float
+  longitude   Float
+  speed       Float?   // km/h
+  heading     Float?   // degrees
+  accuracy    Float?   // meters
+  timestamp   DateTime
+  tripId      String?
+  isValid     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  // Relations
+  bus         Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+  trip        Trip?    @relation(fields: [tripId], references: [id])
+
+  @@index([busId, timestamp])
+  @@map("gps_tracking")
+}
+
+// Trip model
+model Trip {
+  id          String     @id @default(cuid())
+  routeId     String
+  busId       String
+  driverId    String
+  scheduledStart DateTime
+  actualStart DateTime?
+  scheduledEnd   DateTime
+  actualEnd   DateTime?
+  status      TripStatus @default(SCHEDULED)
+  distance    Float?     // km
+  notes       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  route       Route        @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  bus         Bus          @relation(fields: [busId], references: [id], onDelete: Cascade)
+  driver      Driver       @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  trackingData GPSTracking[]
+  attendance  Attendance[]
+
+  @@map("trips")
+}
+
+// Attendance model
+model Attendance {
+  id         String            @id @default(cuid())
+  studentId  String
+  tripId     String
+  pickupTime DateTime?
+  dropTime   DateTime?
+  status     AttendanceStatus  @default(NOT_RECORDED)
+  notes      String?
+  recordedBy String?           // User ID who recorded attendance
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  // Relations
+  student    Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  trip       Trip    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, tripId])
+  @@map("attendance")
+}
+
+// Geofence model
+model Geofence {
+  id          String   @id @default(cuid())
+  busId       String
+  name        String
+  latitude    Float
+  longitude   Float
+  radius      Float    // meters
+  isActive    Boolean  @default(true)
+  alertOnEnter Boolean @default(false)
+  alertOnExit  Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  bus         Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+
+  @@map("geofences")
+}
+
+// Notification model
+model Notification {
+  id          String            @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?             // Additional data for the notification
+  isRead      Boolean           @default(false)
+  priority    AlertSeverity     @default(MEDIUM)
+  sentAt      DateTime          @default(now())
+  readAt      DateTime?
+
+  // Relations
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// Notification preferences model
+model NotificationPreferences {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  emailNotifications  Boolean  @default(true)
+  pushNotifications   Boolean  @default(true)
+  smsNotifications    Boolean  @default(false)
+  busLocationUpdates  Boolean  @default(true)
+  studentPickupAlerts Boolean  @default(true)
+  studentDropAlerts   Boolean  @default(true)
+  delayAlerts         Boolean  @default(true)
+  emergencyAlerts     Boolean  @default(true)
+  speedViolationAlerts Boolean @default(false)
+  attendanceUpdates   Boolean  @default(true)
+  quietHoursStart     String?  // HH:MM format
+  quietHoursEnd       String?  // HH:MM format
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+// Message model
+model Message {
+  id          String       @id @default(cuid())
+  senderId    String
+  receiverId  String
+  type        MessageType  @default(TEXT)
+  content     String
+  attachment  String?      // File path or URL
+  isRead      Boolean      @default(false)
+  sentAt      DateTime     @default(now())
+  readAt      DateTime?
+
+  // Relations
+  sender      User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User         @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId, receiverId])
+  @@map("messages")
+}
+
+// Emergency alert model
+model EmergencyAlert {
+  id          String         @id @default(cuid())
+  busId       String?
+  driverId    String?
+  type        String         // SOS, ACCIDENT, BREAKDOWN, etc.
+  severity    AlertSeverity
+  description String
+  location    Json?          // {latitude, longitude, address}
+  resolved    Boolean        @default(false)
+  resolvedAt  DateTime?
+  resolvedBy  String?        // User ID who resolved
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  bus         Bus?           @relation(fields: [busId], references: [id])
+  driver      Driver?        @relation(fields: [driverId], references: [id])
+
+  @@map("emergency_alerts")
+}
+
+// Driver performance model
+model DriverPerformance {
+  id              String   @id @default(cuid())
+  driverId        String
+  date            DateTime
+  rating          Float    // 1-5 scale
+  incidents       Int      @default(0)
+  distanceDriven  Float    // km
+  hoursDriven     Float    // hours
+  fuelEfficiency  Float?   // km/l
+  feedback        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  driver          Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@unique([driverId, date])
+  @@map("driver_performance")
+}
+
+// Speed violation model
+model SpeedViolation {
+  id          String   @id @default(cuid())
+  busId       String
+  driverId    String?
+  currentSpeed Float
+  speedLimit  Float
+  latitude    Float
+  longitude   Float
+  severity    String   // WARNING, VIOLATION, CRITICAL
+  timestamp   DateTime
+  createdAt   DateTime @default(now())
+
+  // Relations
+  bus         Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+  driver      Driver?  @relation(fields: [driverId], references: [id])
+
+  @@index([busId, timestamp])
+  @@map("speed_violations")
+}
