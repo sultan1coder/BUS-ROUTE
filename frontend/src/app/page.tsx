@@ -1,8 +1,62 @@
-import Link from 'next/link'
-import { ArrowRight, Bus, MapPin, Shield, Bell, Users, BarChart3 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+"use client";
+
+import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  Bus,
+  MapPin,
+  Shield,
+  Bell,
+  Users,
+  BarChart3,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function HomePage() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      // Redirect authenticated users to their appropriate dashboard
+      switch (user.role) {
+        case "ADMIN":
+          router.push("/admin/dashboard");
+          break;
+        case "DRIVER":
+          router.push("/driver/dashboard");
+          break;
+        case "PARENT":
+          router.push("/parent/dashboard");
+          break;
+        case "SCHOOL_STAFF":
+          router.push("/staff/dashboard");
+          break;
+        default:
+          router.push("/dashboard");
+      }
+    }
+  }, [user, isAuthenticated, isLoading, router]);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't show marketing page to authenticated users (they'll be redirected)
+  if (isAuthenticated) {
+    return null;
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Navigation */}
@@ -16,13 +70,22 @@ export default function HomePage() {
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <Link
+                href="#features"
+                className="text-gray-600 hover:text-blue-600 transition-colors"
+              >
                 Features
               </Link>
-              <Link href="#about" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <Link
+                href="#about"
+                className="text-gray-600 hover:text-blue-600 transition-colors"
+              >
                 About
               </Link>
-              <Link href="#contact" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <Link
+                href="#contact"
+                className="text-gray-600 hover:text-blue-600 transition-colors"
+              >
                 Contact
               </Link>
               <div className="flex items-center space-x-4">
@@ -47,9 +110,10 @@ export default function HomePage() {
               <span className="text-blue-600 block">School Transportation</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Comprehensive school bus tracking and management system designed to ensure
-              the safety and reliability of student transportation with real-time monitoring,
-              automated attendance, and instant communication.
+              Comprehensive school bus tracking and management system designed
+              to ensure the safety and reliability of student transportation
+              with real-time monitoring, automated attendance, and instant
+              communication.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/register">
@@ -59,7 +123,11 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/auth/login">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
                   Sign In
                 </Button>
               </Link>
@@ -84,7 +152,8 @@ export default function HomePage() {
               Powerful Features for Modern Schools
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to manage school transportation efficiently and safely
+              Everything you need to manage school transportation efficiently
+              and safely
             </p>
           </div>
 
@@ -97,8 +166,9 @@ export default function HomePage() {
                 Real-Time GPS Tracking
               </h3>
               <p className="text-gray-600">
-                Track buses in real-time with GPS monitoring, route optimization,
-                and instant location updates for parents and administrators.
+                Track buses in real-time with GPS monitoring, route
+                optimization, and instant location updates for parents and
+                administrators.
               </p>
             </div>
 
@@ -149,8 +219,8 @@ export default function HomePage() {
                 Analytics & Reports
               </h3>
               <p className="text-gray-600">
-                Detailed analytics and reporting for fleet performance,
-                safety metrics, attendance patterns, and operational efficiency.
+                Detailed analytics and reporting for fleet performance, safety
+                metrics, attendance patterns, and operational efficiency.
               </p>
             </div>
 
@@ -162,8 +232,8 @@ export default function HomePage() {
                 Fleet Management
               </h3>
               <p className="text-gray-600">
-                Complete fleet management with maintenance tracking,
-                driver assignments, route optimization, and performance monitoring.
+                Complete fleet management with maintenance tracking, driver
+                assignments, route optimization, and performance monitoring.
               </p>
             </div>
           </div>
@@ -177,18 +247,26 @@ export default function HomePage() {
             Ready to Transform Your School Transportation?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of schools already using our platform to ensure safer,
-            more efficient student transportation.
+            Join thousands of schools already using our platform to ensure
+            safer, more efficient student transportation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/register">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="w-full sm:w-auto"
+              >
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link href="#contact">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-blue-600">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-blue-600"
+              >
                 Contact Sales
               </Button>
             </Link>
@@ -203,34 +281,100 @@ export default function HomePage() {
             <div>
               <div className="flex items-center mb-4">
                 <Bus className="h-8 w-8 text-blue-400" />
-                <span className="ml-2 text-xl font-bold">School Bus Tracker</span>
+                <span className="ml-2 text-xl font-bold">
+                  School Bus Tracker
+                </span>
               </div>
               <p className="text-gray-400">
-                Making school transportation safer and more efficient for everyone.
+                Making school transportation safer and more efficient for
+                everyone.
               </p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="#security" className="hover:text-white transition-colors">Security</Link></li>
+                <li>
+                  <Link
+                    href="#features"
+                    className="hover:text-white transition-colors"
+                  >
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#pricing"
+                    className="hover:text-white transition-colors"
+                  >
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#security"
+                    className="hover:text-white transition-colors"
+                  >
+                    Security
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="#docs" className="hover:text-white transition-colors">Documentation</Link></li>
-                <li><Link href="#help" className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link href="#contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+                <li>
+                  <Link
+                    href="#docs"
+                    className="hover:text-white transition-colors"
+                  >
+                    Documentation
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#help"
+                    className="hover:text-white transition-colors"
+                  >
+                    Help Center
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#contact"
+                    className="hover:text-white transition-colors"
+                  >
+                    Contact Us
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="#about" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link href="#blog" className="hover:text-white transition-colors">Blog</Link></li>
-                <li><Link href="#careers" className="hover:text-white transition-colors">Careers</Link></li>
+                <li>
+                  <Link
+                    href="#about"
+                    className="hover:text-white transition-colors"
+                  >
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#blog"
+                    className="hover:text-white transition-colors"
+                  >
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#careers"
+                    className="hover:text-white transition-colors"
+                  >
+                    Careers
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -240,5 +384,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

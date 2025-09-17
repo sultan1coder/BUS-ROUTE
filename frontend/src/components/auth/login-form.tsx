@@ -31,7 +31,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const router = useRouter();
 
   const {
@@ -47,10 +47,25 @@ export function LoginForm() {
       setIsLoading(true);
       setError(null);
       await login(data.email, data.password);
-      router.push("/dashboard");
+
+      // Redirect based on user role
+      setTimeout(() => {
+        if (user?.role === "ADMIN") {
+          router.push("/admin/dashboard");
+        } else if (user?.role === "DRIVER") {
+          router.push("/driver/dashboard");
+        } else if (user?.role === "PARENT") {
+          router.push("/parent/dashboard");
+        } else {
+          router.push("/dashboard");
+        }
+      }, 100);
     } catch (err: any) {
+      console.error("Login error:", err);
       setError(
-        err.response?.data?.message || "Login failed. Please try again."
+        err.response?.data?.message ||
+          err.message ||
+          "Login failed. Please check your credentials and try again."
       );
     } finally {
       setIsLoading(false);

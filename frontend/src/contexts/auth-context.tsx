@@ -34,13 +34,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const response = await api.post("/auth/login", { email, password });
-      const { user, token, refreshToken } = response.data.data;
+      const { user, accessToken, refreshToken } = response.data.data;
 
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(user));
 
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
       setUser(user);
     } catch (error) {
       throw error;
@@ -50,13 +50,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (data: any) => {
     try {
       const response = await api.post("/auth/register", data);
-      const { user, token, refreshToken } = response.data.data;
+      const { user, accessToken, refreshToken } = response.data.data;
 
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(user));
 
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
       setUser(user);
     } catch (error) {
       throw error;

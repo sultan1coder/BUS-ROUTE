@@ -35,14 +35,32 @@ const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:3000",
+        origin: [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:3001",
+            "http://192.168.1.6:3001",
+        ],
         methods: ["GET", "POST"],
+        credentials: true,
     },
 });
 exports.io = io;
 // Middleware
 app.use((0, helmet_1.default)());
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://192.168.1.6:3001", // Network access
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+}));
 app.use((0, morgan_1.default)("combined"));
 app.use(express_1.default.json({ limit: "10mb" }));
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -88,7 +106,7 @@ io.on("connection", (socket) => {
 // Error handling middleware
 app.use(notFound_1.notFound);
 app.use(errorHandler_1.errorHandler);
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 // Initialize connections and start server
 const startServer = async () => {
     try {

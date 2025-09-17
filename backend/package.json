@@ -16,7 +16,9 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "ts-node prisma/seed.ts"
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "setup-admin": "node setup-admin.js",
+    "test-login": "node test-login.js"
   },
   "keywords": [
     "school",
@@ -40,6 +42,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
     "prisma": "^6.16.1",
     "redis": "^5.8.2",
     "socket.io": "^4.8.1"
