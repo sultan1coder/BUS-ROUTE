@@ -222,7 +222,10 @@ function AdminDashboardContent() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Total Users */}
-          <Card className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+          <Card
+            key="total-users"
+            className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          >
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-semibold text-white/90">
@@ -244,7 +247,10 @@ function AdminDashboardContent() {
           </Card>
 
           {/* Active Buses */}
-          <Card className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+          <Card
+            key="active-buses"
+            className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          >
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-semibold text-white/90">
@@ -266,7 +272,10 @@ function AdminDashboardContent() {
           </Card>
 
           {/* Active Trips */}
-          <Card className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-violet-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+          <Card
+            key="active-trips"
+            className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-violet-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          >
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-semibold text-white/90">
@@ -288,7 +297,10 @@ function AdminDashboardContent() {
           </Card>
 
           {/* Total Students */}
-          <Card className="relative overflow-hidden bg-gradient-to-br from-rose-500 to-pink-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+          <Card
+            key="total-students"
+            className="relative overflow-hidden bg-gradient-to-br from-rose-500 to-pink-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          >
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-semibold text-white/90">
@@ -310,7 +322,10 @@ function AdminDashboardContent() {
           </Card>
 
           {/* Active Drivers */}
-          <Card className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+          <Card
+            key="active-drivers"
+            className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          >
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-semibold text-white/90">
@@ -332,7 +347,10 @@ function AdminDashboardContent() {
           </Card>
 
           {/* Active Alerts */}
-          <Card className="relative overflow-hidden bg-gradient-to-br from-red-500 to-red-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+          <Card
+            key="active-alerts"
+            className="relative overflow-hidden bg-gradient-to-br from-red-500 to-red-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          >
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-semibold text-white/90">
@@ -358,6 +376,7 @@ function AdminDashboardContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* User Management */}
           <Card
+            key="user-management"
             className="group cursor-pointer bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:border-purple-300 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative overflow-hidden"
             onClick={() => router.push("/admin/users")}
           >
@@ -378,6 +397,7 @@ function AdminDashboardContent() {
 
           {/* Bus Management */}
           <Card
+            key="bus-management"
             className="group cursor-pointer bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:border-blue-300 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative overflow-hidden"
             onClick={() => router.push("/admin/buses")}
           >
@@ -398,6 +418,7 @@ function AdminDashboardContent() {
 
           {/* Route Management */}
           <Card
+            key="route-management"
             className="group cursor-pointer bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 hover:border-emerald-300 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative overflow-hidden"
             onClick={() => router.push("/admin/routes")}
           >
@@ -418,6 +439,7 @@ function AdminDashboardContent() {
 
           {/* Student Management */}
           <Card
+            key="student-management"
             className="group cursor-pointer bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200 hover:border-rose-300 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative overflow-hidden"
             onClick={() => router.push("/admin/students")}
           >
@@ -438,6 +460,7 @@ function AdminDashboardContent() {
 
           {/* Reports & Analytics */}
           <Card
+            key="reports-analytics"
             className="group cursor-pointer bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 hover:border-indigo-300 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative overflow-hidden"
             onClick={() => router.push("/admin/reports")}
           >
@@ -458,6 +481,7 @@ function AdminDashboardContent() {
 
           {/* Alerts & Safety */}
           <Card
+            key="alerts-safety"
             className="group cursor-pointer bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 hover:border-amber-300 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] relative overflow-hidden"
             onClick={() => router.push("/admin/alerts")}
           >
@@ -524,7 +548,7 @@ function AdminDashboardContent() {
 
                   return (
                     <div
-                      key={activity.id}
+                      key={`activity-${activity.id || index}`}
                       className={`flex items-start space-x-4 p-4 bg-gradient-to-r ${colorScheme.bg} rounded-xl border ${colorScheme.border} hover:shadow-md transition-all duration-200`}
                     >
                       <div className="flex-shrink-0">
