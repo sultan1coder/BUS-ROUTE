@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { AdminApiService } from "@/lib/admin-api";
 import {
   Card,
@@ -926,7 +927,9 @@ export default function UserManagement() {
   return (
     <ToastProvider>
       <ProtectedRoute requiredRole="ADMIN">
-        <UserManagementContent />
+        <AdminLayout>
+          <UserManagementContent />
+        </AdminLayout>
       </ProtectedRoute>
       <ToastViewport />
     </ToastProvider>

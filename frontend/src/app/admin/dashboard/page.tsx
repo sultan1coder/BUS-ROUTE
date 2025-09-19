@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import {
   AdminApiService,
   type DashboardStats,
@@ -24,7 +25,6 @@ import {
   AlertTriangle,
   BarChart3,
   Settings,
-  LogOut,
   Shield,
   UserCheck,
   Clock,
@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 
 function AdminDashboardContent() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -64,13 +64,13 @@ function AdminDashboardContent() {
       if (activitiesResponse && activitiesResponse.activities) {
         setActivities(activitiesResponse.activities);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to load dashboard data:", err);
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to load dashboard data. Please try again."
-      );
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to load dashboard data. Please try again.";
+      setError(errorMessage);
 
       // Fallback to mock data if API fails
       setStats({
@@ -102,11 +102,6 @@ function AdminDashboardContent() {
       activeTrips: 8,
       activeAlerts: 2,
     });
-  };
-
-  const handleLogout = () => {
-    logout();
-    router.push("/auth/login");
   };
 
   const handleRefresh = async () => {
@@ -160,65 +155,55 @@ function AdminDashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-lg shadow-lg border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur-lg opacity-30"></div>
-                <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl">
-                  <Shield className="h-6 w-6 text-white" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  Admin Dashboard
-                </h1>
-                <p className="text-gray-600 font-medium">
-                  Welcome back, {user.firstName}! 👋
-                </p>
+      <div className="bg-white/80 backdrop-blur-lg shadow-lg border border-gray-200 rounded-xl p-6">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur-lg opacity-30"></div>
+              <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl">
+                <Shield className="h-6 w-6 text-white" />
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button
-                variant="outline"
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="border-gray-300 hover:border-green-400 hover:bg-green-50 transition-all duration-200"
-              >
-                <RefreshCw
-                  className={`h-4 w-4 mr-2 text-green-600 ${
-                    isRefreshing ? "animate-spin" : ""
-                  }`}
-                />
-                <span className="text-green-700 font-medium">
-                  {isRefreshing ? "Refreshing..." : "Refresh"}
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => router.push("/admin/settings")}
-                className="border-gray-300 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
-              >
-                <Settings className="h-4 w-4 mr-2 text-blue-600" />
-                <span className="text-blue-700 font-medium">Settings</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                className="border-red-300 hover:border-red-400 hover:bg-red-50 transition-all duration-200"
-              >
-                <LogOut className="h-4 w-4 mr-2 text-red-600" />
-                <span className="text-red-700 font-medium">Logout</span>
-              </Button>
+            <div className="ml-4">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Admin Dashboard
+              </h1>
+              <p className="text-gray-600 font-medium">
+                Welcome back, {user.firstName}! 👋
+              </p>
             </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="border-gray-300 hover:border-green-400 hover:bg-green-50 transition-all duration-200"
+            >
+              <RefreshCw
+                className={`h-4 w-4 mr-2 text-green-600 ${
+                  isRefreshing ? "animate-spin" : ""
+                }`}
+              />
+              <span className="text-green-700 font-medium">
+                {isRefreshing ? "Refreshing..." : "Refresh"}
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/admin/settings")}
+              className="border-gray-300 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
+            >
+              <Settings className="h-4 w-4 mr-2 text-blue-600" />
+              <span className="text-blue-700 font-medium">Settings</span>
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Total Users */}
@@ -591,7 +576,9 @@ function AdminDashboardContent() {
 export default function AdminDashboard() {
   return (
     <ProtectedRoute requiredRole="ADMIN">
-      <AdminDashboardContent />
+      <AdminLayout>
+        <AdminDashboardContent />
+      </AdminLayout>
     </ProtectedRoute>
   );
 }
