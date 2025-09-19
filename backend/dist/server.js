@@ -31,6 +31,16 @@ const admin_1 = __importDefault(require("./routes/admin"));
 const driverApp_1 = __importDefault(require("./routes/driverApp"));
 // Load environment variables
 dotenv_1.default.config();
+// Set default environment variables if not provided
+process.env.JWT_SECRET = process.env.JWT_SECRET || "your-super-secret-jwt-key-change-this-in-production";
+process.env.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "your-refresh-token-secret-change-this-in-production";
+process.env.DATABASE_URL = process.env.DATABASE_URL || "postgresql://username:password@localhost:5432/bus_tracking_db?schema=public";
+process.env.REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+process.env.NODE_ENV = process.env.NODE_ENV || "development";
+process.env.PORT = process.env.PORT || "3000";
+process.env.MAX_FILE_SIZE = process.env.MAX_FILE_SIZE || "5242880";
+process.env.UPLOAD_PATH = process.env.UPLOAD_PATH || "./uploads";
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(server, {
@@ -38,9 +48,12 @@ const io = new socket_io_1.Server(server, {
         origin: [
             "http://localhost:3000",
             "http://localhost:3001",
+            "http://localhost:4000",
             "http://127.0.0.1:3000",
             "http://127.0.0.1:3001",
+            "http://127.0.0.1:4000",
             "http://192.168.1.6:3001",
+            "http://192.168.1.6:4000",
         ],
         methods: ["GET", "POST"],
         credentials: true,
@@ -53,9 +66,12 @@ app.use((0, cors_1.default)({
     origin: [
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://localhost:4000",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
-        "http://192.168.1.6:3001", // Network access
+        "http://127.0.0.1:4000",
+        "http://192.168.1.6:3001",
+        "http://192.168.1.6:4000", // Network access
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],

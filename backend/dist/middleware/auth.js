@@ -52,7 +52,15 @@ exports.authenticate = authenticate;
 // Role-based authorization middleware
 const authorize = (...roles) => {
     return (req, res, next) => {
+        console.log("Auth middleware debug:", {
+            hasUser: !!req.user,
+            userRole: req.user?.role,
+            userRoleType: typeof req.user?.role,
+            requiredRoles: roles,
+            rolesMatch: req.user ? roles.includes(req.user.role) : false
+        });
         if (!req.user) {
+            console.log("Auth middleware: No user found in request");
             res.status(401).json({
                 success: false,
                 message: "Authentication required",
@@ -60,12 +68,17 @@ const authorize = (...roles) => {
             return;
         }
         if (!roles.includes(req.user.role)) {
+            console.log("Auth middleware: Role not authorized", {
+                userRole: req.user.role,
+                requiredRoles: roles
+            });
             res.status(403).json({
                 success: false,
                 message: "Insufficient permissions",
             });
             return;
         }
+        console.log("Auth middleware: Authorization successful");
         next();
     };
 };
