@@ -38,9 +38,12 @@ const io = new Server(server, {
     origin: [
       "http://localhost:3000",
       "http://localhost:3001",
+      "http://localhost:4000",
       "http://127.0.0.1:3000",
       "http://127.0.0.1:3001",
+      "http://127.0.0.1:4000",
       "http://192.168.1.6:3001",
+      "http://192.168.1.6:4000",
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -54,9 +57,12 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://localhost:3001",
+      "http://localhost:4000",
       "http://127.0.0.1:3000",
       "http://127.0.0.1:3001",
-      "http://192.168.1.6:3001", // Network access
+      "http://127.0.0.1:4000",
+      "http://192.168.1.6:3001",
+      "http://192.168.1.6:4000", // Network access
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],

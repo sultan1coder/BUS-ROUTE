@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import {
+  AdminApiService,
+  type DashboardStats,
+  type Activity,
+} from "@/lib/admin-api";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -23,29 +28,72 @@ import {
   Shield,
   UserCheck,
   Clock,
+  RefreshCw,
 } from "lucide-react";
-
-interface DashboardStats {
-  totalUsers: number;
-  totalBuses: number;
-  totalDrivers: number;
-  totalStudents: number;
-  activeTrips: number;
-  activeAlerts: number;
-}
 
 function AdminDashboardContent() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    // Load dashboard stats (mock data for now)
-    loadDashboardStats();
+    loadDashboardData();
   }, []);
 
-  const loadDashboardStats = async () => {
-    // Mock data - replace with actual API call
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // Fetch dashboard data and recent activities in parallel
+      const [dashboardResponse, activitiesResponse] = await Promise.all([
+        AdminApiService.getDashboardData(),
+        AdminApiService.getRecentActivities(4),
+      ]);
+
+      // Extract stats from dashboard data
+      if (dashboardResponse && dashboardResponse.stats) {
+        setStats(dashboardResponse.stats);
+      }
+
+      // Extract activities
+      if (activitiesResponse && activitiesResponse.activities) {
+        setActivities(activitiesResponse.activities);
+      }
+    } catch (err: any) {
+      console.error("Failed to load dashboard data:", err);
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load dashboard data. Please try again."
+      );
+
+      // Fallback to mock data if API fails
+      setStats({
+        totalUsers: 245,
+        totalBuses: 12,
+        totalDrivers: 15,
+        totalStudents: 180,
+        activeTrips: 8,
+        activeAlerts: 2,
+      });
+
+      // Mock activities as fallback
+      setActivities([
+        {
+          id: "1",
+          type: "INFO",
+          description: "System initialized",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
     setStats({
       totalUsers: 245,
       totalBuses: 12,
@@ -60,6 +108,56 @@ function AdminDashboardContent() {
     logout();
     router.push("/auth/login");
   };
+
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      setError(null);
+      await loadDashboardData();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            Loading Dashboard...
+          </h2>
+          <p className="text-gray-500">Fetching latest data from the server</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-4">
+            <div className="text-red-500 mb-2">
+              <AlertTriangle className="h-8 w-8 mx-auto" />
+            </div>
+            <h3 className="text-lg font-semibold text-red-800 mb-2">
+              Failed to Load Dashboard
+            </h3>
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+          <Button
+            onClick={loadDashboardData}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -84,6 +182,21 @@ function AdminDashboardContent() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="border-gray-300 hover:border-green-400 hover:bg-green-50 transition-all duration-200"
+              >
+                <RefreshCw
+                  className={`h-4 w-4 mr-2 text-green-600 ${
+                    isRefreshing ? "animate-spin" : ""
+                  }`}
+                />
+                <span className="text-green-700 font-medium">
+                  {isRefreshing ? "Refreshing..." : "Refresh"}
+                </span>
+              </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push("/admin/settings")}
@@ -379,61 +492,70 @@ function AdminDashboardContent() {
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-5">
-              <div className="flex items-start space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 hover:shadow-md transition-all duration-200">
-                <div className="flex-shrink-0">
-                  <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-green-500 rounded-full shadow-sm"></div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-green-800">
-                    🚍 Bus #001 started trip to Downtown School
-                  </p>
-                  <p className="text-xs text-green-600 font-medium mt-1">
-                    2 minutes ago
-                  </p>
-                </div>
-              </div>
+              {activities.length > 0 ? (
+                activities.map((activity, index) => {
+                  const colors = [
+                    {
+                      bg: "from-green-50 to-emerald-50",
+                      border: "border-green-200",
+                      text: "text-green-800",
+                      dot: "from-green-400 to-green-500",
+                    },
+                    {
+                      bg: "from-blue-50 to-indigo-50",
+                      border: "border-blue-200",
+                      text: "text-blue-800",
+                      dot: "from-blue-400 to-blue-500",
+                    },
+                    {
+                      bg: "from-amber-50 to-orange-50",
+                      border: "border-amber-200",
+                      text: "text-amber-800",
+                      dot: "from-amber-400 to-amber-500",
+                    },
+                    {
+                      bg: "from-purple-50 to-violet-50",
+                      border: "border-purple-200",
+                      text: "text-purple-800",
+                      dot: "from-purple-400 to-purple-500",
+                    },
+                  ];
+                  const colorScheme = colors[index % colors.length];
 
-              <div className="flex items-start space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-200">
-                <div className="flex-shrink-0">
-                  <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full shadow-sm"></div>
+                  return (
+                    <div
+                      key={activity.id}
+                      className={`flex items-start space-x-4 p-4 bg-gradient-to-r ${colorScheme.bg} rounded-xl border ${colorScheme.border} hover:shadow-md transition-all duration-200`}
+                    >
+                      <div className="flex-shrink-0">
+                        <div
+                          className={`w-3 h-3 bg-gradient-to-r ${colorScheme.dot} rounded-full shadow-sm`}
+                        ></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className={`text-sm font-semibold ${colorScheme.text}`}
+                        >
+                          {activity.description}
+                        </p>
+                        <p
+                          className={`text-xs ${colorScheme.text.replace(
+                            "800",
+                            "600"
+                          )} font-medium mt-1`}
+                        >
+                          {new Date(activity.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-8">
+                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-500">No recent activities</p>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-blue-800">
-                    👤 Driver John Smith checked in
-                  </p>
-                  <p className="text-xs text-blue-600 font-medium mt-1">
-                    5 minutes ago
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200 hover:shadow-md transition-all duration-200">
-                <div className="flex-shrink-0">
-                  <div className="w-3 h-3 bg-gradient-to-r from-amber-400 to-amber-500 rounded-full shadow-sm"></div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-amber-800">
-                    🔧 Maintenance scheduled for Bus #003
-                  </p>
-                  <p className="text-xs text-amber-600 font-medium mt-1">
-                    1 hour ago
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4 p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-200 hover:shadow-md transition-all duration-200">
-                <div className="flex-shrink-0">
-                  <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full shadow-sm"></div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-purple-800">
-                    📊 New student registered for Route A
-                  </p>
-                  <p className="text-xs text-purple-600 font-medium mt-1">
-                    3 hours ago
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
