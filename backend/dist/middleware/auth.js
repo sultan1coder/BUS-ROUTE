@@ -10,8 +10,16 @@ const database_1 = __importDefault(require("../config/database"));
 // Authentication middleware
 const authenticate = async (req, res, next) => {
     try {
+        console.log("🔑 Authentication middleware:", {
+            method: req.method,
+            url: req.url,
+            hasAuthHeader: !!req.headers.authorization,
+            authHeader: req.headers.authorization ? "Present (hidden)" : "Missing",
+        });
         const token = (0, jwt_1.extractTokenFromHeader)(req.headers.authorization);
+        console.log("🔑 Extracted token:", token ? "Present" : "Missing");
         if (!token) {
+            console.log("❌ No token provided");
             res.status(401).json({
                 success: false,
                 message: "Access token is required",
@@ -19,6 +27,11 @@ const authenticate = async (req, res, next) => {
             return;
         }
         const decoded = (0, jwt_1.verifyToken)(token);
+        console.log("🔑 Token decoded:", {
+            id: decoded.id,
+            email: decoded.email,
+            role: decoded.role,
+        });
         // Get user details from database
         const user = await database_1.default.user.findUnique({
             where: { id: decoded.id },
@@ -31,7 +44,13 @@ const authenticate = async (req, res, next) => {
                 isActive: true,
             },
         });
+        console.log("🔑 User lookup result:", {
+            userFound: !!user,
+            isActive: user?.isActive,
+            userRole: user?.role,
+        });
         if (!user || !user.isActive) {
+            console.log("❌ User not found or inactive");
             res.status(401).json({
                 success: false,
                 message: "User not found or inactive",
@@ -39,9 +58,11 @@ const authenticate = async (req, res, next) => {
             return;
         }
         req.user = user;
+        console.log("✅ Authentication successful - user attached to request");
         next();
     }
     catch (error) {
+        console.log("❌ Authentication error:", error instanceof Error ? error.message : String(error));
         res.status(401).json({
             success: false,
             message: "Invalid or expired token",
@@ -52,15 +73,21 @@ exports.authenticate = authenticate;
 // Role-based authorization middleware
 const authorize = (...roles) => {
     return (req, res, next) => {
-        console.log("Auth middleware debug:", {
+        console.log("🔐 Auth middleware debug:", {
             hasUser: !!req.user,
             userRole: req.user?.role,
             userRoleType: typeof req.user?.role,
             requiredRoles: roles,
-            rolesMatch: req.user ? roles.includes(req.user.role) : false
+            rolesMatch: req.user ? roles.includes(req.user.role) : false,
+            method: req.method,
+            url: req.url,
+            headers: {
+                authorization: req.headers.authorization ? "Present" : "Missing",
+                contentType: req.headers["content-type"],
+            },
         });
         if (!req.user) {
-            console.log("Auth middleware: No user found in request");
+            console.log("❌ Auth middleware: No user found in request");
             res.status(401).json({
                 success: false,
                 message: "Authentication required",
@@ -68,9 +95,9 @@ const authorize = (...roles) => {
             return;
         }
         if (!roles.includes(req.user.role)) {
-            console.log("Auth middleware: Role not authorized", {
+            console.log("❌ Auth middleware: Role not authorized", {
                 userRole: req.user.role,
-                requiredRoles: roles
+                requiredRoles: roles,
             });
             res.status(403).json({
                 success: false,
@@ -78,7 +105,7 @@ const authorize = (...roles) => {
             });
             return;
         }
-        console.log("Auth middleware: Authorization successful");
+        console.log("✅ Auth middleware: Authorization successful");
         next();
     };
 };

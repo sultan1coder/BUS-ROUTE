@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AdminController } from "../controllers/adminController";
-import { requireAdmin } from "../middleware/auth";
+import { authenticate, requireAdmin } from "../middleware/auth";
 import {
   validateUUID,
   validatePagination,
@@ -9,7 +9,8 @@ import {
 
 const router = Router();
 
-// All routes require admin access
+// All routes require authentication and admin access
+router.use(authenticate);
 router.use(requireAdmin);
 
 // Dashboard and overview

@@ -10,9 +10,18 @@ export const authenticate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    console.log("🔑 Authentication middleware:", {
+      method: req.method,
+      url: req.url,
+      hasAuthHeader: !!req.headers.authorization,
+      authHeader: req.headers.authorization ? "Present (hidden)" : "Missing",
+    });
+
     const token = extractTokenFromHeader(req.headers.authorization);
+    console.log("🔑 Extracted token:", token ? "Present" : "Missing");
 
     if (!token) {
+      console.log("❌ No token provided");
       res.status(401).json({
         success: false,
         message: "Access token is required",
@@ -21,6 +30,11 @@ export const authenticate = async (
     }
 
     const decoded = verifyToken(token);
+    console.log("🔑 Token decoded:", {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
+    });
 
     // Get user details from database
     const user = await prisma.user.findUnique({
@@ -35,7 +49,14 @@ export const authenticate = async (
       },
     });
 
+    console.log("🔑 User lookup result:", {
+      userFound: !!user,
+      isActive: user?.isActive,
+      userRole: user?.role,
+    });
+
     if (!user || !user.isActive) {
+      console.log("❌ User not found or inactive");
       res.status(401).json({
         success: false,
         message: "User not found or inactive",
@@ -44,8 +65,13 @@ export const authenticate = async (
     }
 
     req.user = user;
+    console.log("✅ Authentication successful - user attached to request");
     next();
   } catch (error) {
+    console.log(
+      "❌ Authentication error:",
+      error instanceof Error ? error.message : String(error)
+    );
     res.status(401).json({
       success: false,
       message: "Invalid or expired token",
@@ -60,7 +86,22 @@ export const authorize = (...roles: UserRole[]) => {
     res: Response,
     next: NextFunction
   ): void => {
+    console.log("🔐 Auth middleware debug:", {
+      hasUser: !!req.user,
+      userRole: req.user?.role,
+      userRoleType: typeof req.user?.role,
+      requiredRoles: roles,
+      rolesMatch: req.user ? roles.includes(req.user.role) : false,
+      method: req.method,
+      url: req.url,
+      headers: {
+        authorization: req.headers.authorization ? "Present" : "Missing",
+        contentType: req.headers["content-type"],
+      },
+    });
+
     if (!req.user) {
+      console.log("❌ Auth middleware: No user found in request");
       res.status(401).json({
         success: false,
         message: "Authentication required",
@@ -69,6 +110,10 @@ export const authorize = (...roles: UserRole[]) => {
     }
 
     if (!roles.includes(req.user.role)) {
+      console.log("❌ Auth middleware: Role not authorized", {
+        userRole: req.user.role,
+        requiredRoles: roles,
+      });
       res.status(403).json({
         success: false,
         message: "Insufficient permissions",
@@ -76,6 +121,7 @@ export const authorize = (...roles: UserRole[]) => {
       return;
     }
 
+    console.log("✅ Auth middleware: Authorization successful");
     next();
   };
 };

@@ -5,7 +5,8 @@ const adminController_1 = require("../controllers/adminController");
 const auth_1 = require("../middleware/auth");
 const validation_1 = require("../middleware/validation");
 const router = (0, express_1.Router)();
-// All routes require admin access
+// All routes require authentication and admin access
+router.use(auth_1.authenticate);
 router.use(auth_1.requireAdmin);
 // Dashboard and overview
 router.get("/overview", validation_1.handleValidationErrors, adminController_1.AdminController.getSystemOverview);
