@@ -33,6 +33,10 @@ router.put("/users/:userId/reactivate", validation_1.validateUUID, validation_1.
 router.get("/buses", validation_1.validatePagination, validation_1.handleValidationErrors, adminController_1.AdminController.getAllBuses);
 // School management
 router.get("/schools", validation_1.validatePagination, validation_1.handleValidationErrors, adminController_1.AdminController.getAllSchools);
+router.post("/schools", validation_1.validateSchoolCreation, validation_1.handleValidationErrors, adminController_1.AdminController.createSchool);
+router.get("/schools/:id", validation_1.validateUUID, validation_1.handleValidationErrors, adminController_1.AdminController.getSchoolById);
+router.put("/schools/:id", validation_1.validateUUID, validation_1.validateSchoolUpdate, validation_1.handleValidationErrors, adminController_1.AdminController.updateSchool);
+router.delete("/schools/:id", validation_1.validateUUID, validation_1.handleValidationErrors, adminController_1.AdminController.deleteSchool);
 // Activity and monitoring
 router.get("/activities", validation_1.validatePagination, validation_1.handleValidationErrors, adminController_1.AdminController.getRecentActivities);
 router.get("/logs", validation_1.validatePagination, validation_1.handleValidationErrors, adminController_1.AdminController.getSystemLogs);

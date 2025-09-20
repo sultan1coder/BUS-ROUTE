@@ -1,6 +1,35 @@
 import prisma from "../config/database";
 import { CustomError } from "../middleware/errorHandler";
 
+// School interfaces
+export interface CreateSchoolData {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country?: string;
+  phone?: string;
+  email?: string;
+  latitude?: number;
+  longitude?: number;
+  timezone?: string;
+}
+
+export interface UpdateSchoolData {
+  name?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  phone?: string;
+  email?: string;
+  latitude?: number;
+  longitude?: number;
+  timezone?: string;
+}
+
 export interface SystemOverview {
   totalUsers: number;
   totalBuses: number;
@@ -978,5 +1007,193 @@ export class AdminService {
       outstandingPayments: 0,
       revenueBreakdown: [],
     };
+  }
+
+  // School management methods
+  static async createSchool(schoolData: CreateSchoolData): Promise<any> {
+    // Check if school with same name and address already exists
+    const existingSchool = await prisma.school.findFirst({
+      where: {
+        name: schoolData.name,
+        address: schoolData.address,
+        city: schoolData.city,
+        state: schoolData.state,
+      },
+    });
+
+    if (existingSchool) {
+      throw new CustomError(
+        "School with this name and address already exists",
+        409
+      );
+    }
+
+    // Check if email is provided and unique
+    if (schoolData.email) {
+      const existingEmail = await prisma.school.findFirst({
+        where: { email: schoolData.email },
+      });
+
+      if (existingEmail) {
+        throw new CustomError("School with this email already exists", 409);
+      }
+    }
+
+    const school = await prisma.school.create({
+      data: {
+        name: schoolData.name,
+        address: schoolData.address,
+        city: schoolData.city,
+        state: schoolData.state,
+        zipCode: schoolData.zipCode,
+        country: schoolData.country || "US",
+        phone: schoolData.phone,
+        email: schoolData.email,
+        latitude: schoolData.latitude,
+        longitude: schoolData.longitude,
+        timezone: schoolData.timezone || "America/New_York",
+      },
+      include: {
+        _count: {
+          select: {
+            buses: true,
+            students: true,
+            staff: true,
+          },
+        },
+      },
+    });
+
+    return school;
+  }
+
+  static async updateSchool(
+    schoolId: string,
+    schoolData: UpdateSchoolData
+  ): Promise<any> {
+    // Check if school exists
+    const existingSchool = await prisma.school.findUnique({
+      where: { id: schoolId },
+    });
+
+    if (!existingSchool) {
+      throw new CustomError("School not found", 404);
+    }
+
+    // Check if email is provided and unique (if different from current)
+    if (schoolData.email && schoolData.email !== existingSchool.email) {
+      const existingEmail = await prisma.school.findFirst({
+        where: {
+          email: schoolData.email,
+          id: { not: schoolId },
+        },
+      });
+
+      if (existingEmail) {
+        throw new CustomError("School with this email already exists", 409);
+      }
+    }
+
+    // Check if name and address combination is unique (if different from current)
+    if (
+      (schoolData.name && schoolData.name !== existingSchool.name) ||
+      (schoolData.address && schoolData.address !== existingSchool.address) ||
+      (schoolData.city && schoolData.city !== existingSchool.city) ||
+      (schoolData.state && schoolData.state !== existingSchool.state)
+    ) {
+      const existingSchoolData = await prisma.school.findFirst({
+        where: {
+          name: schoolData.name || existingSchool.name,
+          address: schoolData.address || existingSchool.address,
+          city: schoolData.city || existingSchool.city,
+          state: schoolData.state || existingSchool.state,
+          id: { not: schoolId },
+        },
+      });
+
+      if (existingSchoolData) {
+        throw new CustomError(
+          "School with this name and address already exists",
+          409
+        );
+      }
+    }
+
+    const school = await prisma.school.update({
+      where: { id: schoolId },
+      data: {
+        ...schoolData,
+        updatedAt: new Date(),
+      },
+      include: {
+        _count: {
+          select: {
+            buses: true,
+            students: true,
+            staff: true,
+          },
+        },
+      },
+    });
+
+    return school;
+  }
+
+  static async deleteSchool(schoolId: string): Promise<void> {
+    // Check if school exists
+    const existingSchool = await prisma.school.findUnique({
+      where: { id: schoolId },
+      include: {
+        _count: {
+          select: {
+            buses: true,
+            students: true,
+            staff: true,
+          },
+        },
+      },
+    });
+
+    if (!existingSchool) {
+      throw new CustomError("School not found", 404);
+    }
+
+    // Check if school has associated data
+    const hasAssociatedData =
+      existingSchool._count.buses > 0 ||
+      existingSchool._count.students > 0 ||
+      existingSchool._count.staff > 0;
+
+    if (hasAssociatedData) {
+      throw new CustomError(
+        "Cannot delete school with associated buses, students, or staff. Please remove all associated data first.",
+        409
+      );
+    }
+
+    await prisma.school.delete({
+      where: { id: schoolId },
+    });
+  }
+
+  static async getSchoolById(schoolId: string): Promise<any> {
+    const school = await prisma.school.findUnique({
+      where: { id: schoolId },
+      include: {
+        _count: {
+          select: {
+            buses: true,
+            students: true,
+            staff: true,
+          },
+        },
+      },
+    });
+
+    if (!school) {
+      throw new CustomError("School not found", 404);
+    }
+
+    return school;
   }
 }

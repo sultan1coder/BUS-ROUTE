@@ -4,6 +4,8 @@ import { authenticate, requireAdmin } from "../middleware/auth";
 import {
   validateUUID,
   validatePagination,
+  validateSchoolCreation,
+  validateSchoolUpdate,
   handleValidationErrors,
 } from "../middleware/validation";
 
@@ -113,6 +115,35 @@ router.get(
   validatePagination,
   handleValidationErrors,
   AdminController.getAllSchools
+);
+
+router.post(
+  "/schools",
+  validateSchoolCreation,
+  handleValidationErrors,
+  AdminController.createSchool
+);
+
+router.get(
+  "/schools/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.getSchoolById
+);
+
+router.put(
+  "/schools/:id",
+  validateUUID,
+  validateSchoolUpdate,
+  handleValidationErrors,
+  AdminController.updateSchool
+);
+
+router.delete(
+  "/schools/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.deleteSchool
 );
 
 // Activity and monitoring

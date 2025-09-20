@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateDriverStatusUpdate = exports.validateDriverEmergency = exports.validateNavigationRequest = exports.validateLocationUpdate = exports.validateStudentDrop = exports.validateStudentPickup = exports.validateTripUpdate = exports.validateTripStart = exports.validateEmergencySMS = exports.validateAlertResolution = exports.validateGeofenceCheck = exports.validateSpeedViolation = exports.validateGeofence = exports.validateSOSAlert = exports.validateSearchMessages = exports.validateBulkMessage = exports.validateSendMessage = exports.validatePagination = exports.validateSchoolId = exports.validateUUID = exports.validateGeofenceCreation = exports.validateEmergencyAlert = exports.validateTripCreation = exports.validateGPSData = exports.validateBulkTagAssignment = exports.validateManualAttendance = exports.validateNFCAttendance = exports.validateRFIDAttendance = exports.validateAttendanceData = exports.validateRouteAssignment = exports.validateStudentCreation = exports.validateStudentData = exports.validateRouteStopUpdate = exports.validateRouteStopCreation = exports.validateRouteUpdate = exports.validateRouteCreation = exports.validateDriverUpdate = exports.validateDriverCreation = exports.validateBusUpdate = exports.validateBusCreation = exports.validatePasswordChange = exports.validatePasswordReset = exports.validateUserLogin = exports.validateUserRegistration = exports.handleValidationErrors = void 0;
+exports.validateDriverStatusUpdate = exports.validateDriverEmergency = exports.validateNavigationRequest = exports.validateLocationUpdate = exports.validateStudentDrop = exports.validateStudentPickup = exports.validateTripUpdate = exports.validateTripStart = exports.validateEmergencySMS = exports.validateAlertResolution = exports.validateGeofenceCheck = exports.validateSpeedViolation = exports.validateGeofence = exports.validateSOSAlert = exports.validateSearchMessages = exports.validateBulkMessage = exports.validateSendMessage = exports.validatePagination = exports.validateSchoolId = exports.validateUUID = exports.validateGeofenceCreation = exports.validateEmergencyAlert = exports.validateTripCreation = exports.validateGPSData = exports.validateBulkTagAssignment = exports.validateManualAttendance = exports.validateNFCAttendance = exports.validateRFIDAttendance = exports.validateAttendanceData = exports.validateRouteAssignment = exports.validateStudentCreation = exports.validateStudentData = exports.validateRouteStopUpdate = exports.validateRouteStopCreation = exports.validateRouteUpdate = exports.validateRouteCreation = exports.validateDriverUpdate = exports.validateDriverCreation = exports.validateBusUpdate = exports.validateSchoolUpdate = exports.validateSchoolCreation = exports.validateBusCreation = exports.validatePasswordChange = exports.validatePasswordReset = exports.validateUserLogin = exports.validateUserRegistration = exports.handleValidationErrors = void 0;
 const express_validator_1 = require("express-validator");
 const types_1 = require("../types");
 // Handle validation errors
@@ -80,7 +80,115 @@ exports.validateBusCreation = [
         .isInt({ min: 2000, max: new Date().getFullYear() + 1 })
         .withMessage("Please provide a valid year"),
     (0, express_validator_1.body)("color").trim().notEmpty().withMessage("Color is required"),
-    (0, express_validator_1.body)("schoolId").isUUID().withMessage("Valid school ID is required"),
+    (0, express_validator_1.body)("schoolId")
+        .isLength({ min: 1 })
+        .withMessage("Valid school ID is required"),
+];
+// School validation rules
+exports.validateSchoolCreation = [
+    (0, express_validator_1.body)("name")
+        .trim()
+        .isLength({ min: 2, max: 100 })
+        .withMessage("School name must be between 2 and 100 characters"),
+    (0, express_validator_1.body)("address")
+        .trim()
+        .isLength({ min: 5, max: 200 })
+        .withMessage("Address must be between 5 and 200 characters"),
+    (0, express_validator_1.body)("city")
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage("City must be between 2 and 50 characters"),
+    (0, express_validator_1.body)("state")
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage("State must be between 2 and 50 characters"),
+    (0, express_validator_1.body)("zipCode")
+        .trim()
+        .matches(/^\d{5}(-\d{4})?$/)
+        .withMessage("Zip code must be in format 12345 or 12345-6789"),
+    (0, express_validator_1.body)("country")
+        .optional()
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage("Country must be between 2 and 50 characters"),
+    (0, express_validator_1.body)("phone")
+        .optional()
+        .trim()
+        .matches(/^\+?[\d\s\-\(\)]+$/)
+        .withMessage("Please provide a valid phone number"),
+    (0, express_validator_1.body)("email")
+        .optional()
+        .isEmail()
+        .normalizeEmail()
+        .withMessage("Please provide a valid email address"),
+    (0, express_validator_1.body)("latitude")
+        .optional()
+        .isFloat({ min: -90, max: 90 })
+        .withMessage("Latitude must be between -90 and 90"),
+    (0, express_validator_1.body)("longitude")
+        .optional()
+        .isFloat({ min: -180, max: 180 })
+        .withMessage("Longitude must be between -180 and 180"),
+    (0, express_validator_1.body)("timezone")
+        .optional()
+        .trim()
+        .isLength({ min: 3, max: 50 })
+        .withMessage("Timezone must be between 3 and 50 characters"),
+];
+exports.validateSchoolUpdate = [
+    (0, express_validator_1.body)("name")
+        .optional()
+        .trim()
+        .isLength({ min: 2, max: 100 })
+        .withMessage("School name must be between 2 and 100 characters"),
+    (0, express_validator_1.body)("address")
+        .optional()
+        .trim()
+        .isLength({ min: 5, max: 200 })
+        .withMessage("Address must be between 5 and 200 characters"),
+    (0, express_validator_1.body)("city")
+        .optional()
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage("City must be between 2 and 50 characters"),
+    (0, express_validator_1.body)("state")
+        .optional()
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage("State must be between 2 and 50 characters"),
+    (0, express_validator_1.body)("zipCode")
+        .optional()
+        .trim()
+        .matches(/^\d{5}(-\d{4})?$/)
+        .withMessage("Zip code must be in format 12345 or 12345-6789"),
+    (0, express_validator_1.body)("country")
+        .optional()
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage("Country must be between 2 and 50 characters"),
+    (0, express_validator_1.body)("phone")
+        .optional()
+        .trim()
+        .matches(/^\+?[\d\s\-\(\)]+$/)
+        .withMessage("Please provide a valid phone number"),
+    (0, express_validator_1.body)("email")
+        .optional()
+        .isEmail()
+        .normalizeEmail()
+        .withMessage("Please provide a valid email address"),
+    (0, express_validator_1.body)("latitude")
+        .optional()
+        .isFloat({ min: -90, max: 90 })
+        .withMessage("Latitude must be between -90 and 90"),
+    (0, express_validator_1.body)("longitude")
+        .optional()
+        .isFloat({ min: -180, max: 180 })
+        .withMessage("Longitude must be between -180 and 180"),
+    (0, express_validator_1.body)("timezone")
+        .optional()
+        .trim()
+        .isLength({ min: 3, max: 50 })
+        .withMessage("Timezone must be between 3 and 50 characters"),
 ];
 exports.validateBusUpdate = [
     (0, express_validator_1.body)("plateNumber")
@@ -495,10 +603,10 @@ exports.validateGeofenceCreation = [
 ];
 // Parameter validation
 exports.validateUUID = [
-    (0, express_validator_1.param)("id").isUUID().withMessage("Valid ID is required"),
+    (0, express_validator_1.param)("id").isLength({ min: 1 }).withMessage("Valid ID is required"),
 ];
 exports.validateSchoolId = [
-    (0, express_validator_1.param)("schoolId").isUUID().withMessage("Valid school ID is required"),
+    (0, express_validator_1.param)("schoolId").isLength({ min: 1 }).withMessage("Valid school ID is required"),
 ];
 // Query parameter validation
 exports.validatePagination = [

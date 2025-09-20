@@ -1,6 +1,10 @@
 import { Response } from "express";
 import { AuthenticatedRequest, ApiResponse, PaginatedResponse } from "../types";
-import { AdminService } from "../services/adminService";
+import {
+  AdminService,
+  CreateSchoolData,
+  UpdateSchoolData,
+} from "../services/adminService";
 import { asyncHandler } from "../middleware/errorHandler";
 import prisma from "../config/database";
 
@@ -710,4 +714,72 @@ export class AdminController {
 
     return csvRows.join("\n");
   }
+
+  // School management methods
+  static createSchool = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const schoolData: CreateSchoolData = req.body;
+
+      const school = await AdminService.createSchool(schoolData);
+
+      res.status(201).json({
+        success: true,
+        message: "School created successfully",
+        data: school,
+      });
+    }
+  );
+
+  static updateSchool = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+      const schoolData: UpdateSchoolData = req.body;
+
+      const school = await AdminService.updateSchool(id, schoolData);
+
+      res.status(200).json({
+        success: true,
+        message: "School updated successfully",
+        data: school,
+      });
+    }
+  );
+
+  static deleteSchool = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+
+      await AdminService.deleteSchool(id);
+
+      res.status(200).json({
+        success: true,
+        message: "School deleted successfully",
+      });
+    }
+  );
+
+  static getSchoolById = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+
+      const school = await AdminService.getSchoolById(id);
+
+      res.status(200).json({
+        success: true,
+        data: school,
+      });
+    }
+  );
 }

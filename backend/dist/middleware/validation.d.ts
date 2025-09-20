@@ -5,6 +5,8 @@ export declare const validateUserLogin: import("express-validator").ValidationCh
 export declare const validatePasswordReset: import("express-validator").ValidationChain[];
 export declare const validatePasswordChange: import("express-validator").ValidationChain[];
 export declare const validateBusCreation: import("express-validator").ValidationChain[];
+export declare const validateSchoolCreation: import("express-validator").ValidationChain[];
+export declare const validateSchoolUpdate: import("express-validator").ValidationChain[];
 export declare const validateBusUpdate: import("express-validator").ValidationChain[];
 export declare const validateDriverCreation: import("express-validator").ValidationChain[];
 export declare const validateDriverUpdate: import("express-validator").ValidationChain[];

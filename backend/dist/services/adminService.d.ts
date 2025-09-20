@@ -1,3 +1,29 @@
+export interface CreateSchoolData {
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country?: string;
+    phone?: string;
+    email?: string;
+    latitude?: number;
+    longitude?: number;
+    timezone?: string;
+}
+export interface UpdateSchoolData {
+    name?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+    phone?: string;
+    email?: string;
+    latitude?: number;
+    longitude?: number;
+    timezone?: string;
+}
 export interface SystemOverview {
     totalUsers: number;
     totalBuses: number;
@@ -154,5 +180,9 @@ export declare class AdminService {
     private static getSafetyDetailedReport;
     private static getCommunicationDetailedReport;
     private static getFinancialDetailedReport;
+    static createSchool(schoolData: CreateSchoolData): Promise<any>;
+    static updateSchool(schoolId: string, schoolData: UpdateSchoolData): Promise<any>;
+    static deleteSchool(schoolId: string): Promise<void>;
+    static getSchoolById(schoolId: string): Promise<any>;
 }
 //# sourceMappingURL=adminService.d.ts.map

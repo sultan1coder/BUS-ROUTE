@@ -501,4 +501,40 @@ AdminController.getSystemLogs = (0, errorHandler_1.asyncHandler)(async (req, res
         },
     });
 });
+// School management methods
+AdminController.createSchool = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const schoolData = req.body;
+    const school = await adminService_1.AdminService.createSchool(schoolData);
+    res.status(201).json({
+        success: true,
+        message: "School created successfully",
+        data: school,
+    });
+});
+AdminController.updateSchool = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { id } = req.params;
+    const schoolData = req.body;
+    const school = await adminService_1.AdminService.updateSchool(id, schoolData);
+    res.status(200).json({
+        success: true,
+        message: "School updated successfully",
+        data: school,
+    });
+});
+AdminController.deleteSchool = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { id } = req.params;
+    await adminService_1.AdminService.deleteSchool(id);
+    res.status(200).json({
+        success: true,
+        message: "School deleted successfully",
+    });
+});
+AdminController.getSchoolById = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { id } = req.params;
+    const school = await adminService_1.AdminService.getSchoolById(id);
+    res.status(200).json({
+        success: true,
+        data: school,
+    });
+});
 //# sourceMappingURL=adminController.js.map
