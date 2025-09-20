@@ -97,6 +97,77 @@ export interface PerformanceMetrics {
   diskUsage: number;
 }
 
+// Driver Types
+export interface Driver {
+  id: string;
+  userId: string;
+  licenseNumber: string;
+  licenseExpiry: string;
+  licenseType: string;
+  experienceYears?: number;
+  emergencyContact: string;
+  emergencyPhone: string;
+  medicalInfo?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+  };
+  bus?: {
+    id: string;
+    plateNumber: string;
+    model: string;
+  };
+}
+
+export interface CreateDriverData {
+  userId: string;
+  licenseNumber: string;
+  licenseExpiry: string;
+  licenseType: string;
+  experienceYears?: number;
+  emergencyContact: string;
+  emergencyPhone: string;
+  medicalInfo?: string;
+}
+
+export interface UpdateDriverData {
+  licenseNumber?: string;
+  licenseExpiry?: string;
+  licenseType?: string;
+  experienceYears?: number;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  medicalInfo?: string;
+}
+
+export interface DriverStats {
+  totalDrivers: number;
+  activeDrivers: number;
+  inactiveDrivers: number;
+  driversByExperience: Array<{
+    experience: string;
+    count: number;
+  }>;
+  licenseExpiringSoon: number;
+  recentHires: number;
+}
+
+export interface AvailableUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  role: string;
+  isActive: boolean;
+}
+
 // Admin API Service Class
 export class AdminApiService {
   // Get system overview
@@ -407,6 +478,77 @@ export class AdminApiService {
       throw error;
     }
   }
+
+  // Driver Management APIs
+  static async getAllDrivers(filters: Record<string, unknown> = {}) {
+    try {
+      const response = await api.get("/drivers", { params: filters });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch drivers:", error);
+      throw error;
+    }
+  }
+
+  static async getDriverById(driverId: string) {
+    try {
+      const response = await api.get(`/drivers/${driverId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch driver:", error);
+      throw error;
+    }
+  }
+
+  static async createDriver(driverData: CreateDriverData) {
+    try {
+      const response = await api.post("/drivers", driverData);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create driver:", error);
+      throw error;
+    }
+  }
+
+  static async updateDriver(driverId: string, driverData: UpdateDriverData) {
+    try {
+      const response = await api.put(`/drivers/${driverId}`, driverData);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update driver:", error);
+      throw error;
+    }
+  }
+
+  static async deactivateDriver(driverId: string) {
+    try {
+      const response = await api.delete(`/drivers/${driverId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to deactivate driver:", error);
+      throw error;
+    }
+  }
+
+  static async getDriverAnalytics() {
+    try {
+      const response = await api.get("/admin/drivers/analytics");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch driver analytics:", error);
+      throw error;
+    }
+  }
+
+  static async getAvailableUsers() {
+    try {
+      const response = await api.get("/admin/users/available-drivers");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch available users:", error);
+      throw error;
+    }
+  }
 }
 
 // Export individual functions for convenience
@@ -428,4 +570,11 @@ export const {
   getSystemSettings,
   updateSystemSettings,
   runSystemMaintenance,
+  getAllDrivers,
+  getDriverById,
+  createDriver,
+  updateDriver,
+  deactivateDriver,
+  getDriverAnalytics,
+  getAvailableUsers,
 } = AdminApiService;

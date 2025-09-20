@@ -65,6 +65,11 @@ const navigation: NavItem[] = [
     badge: "New",
   },
   {
+    title: "Driver Management",
+    href: "/admin/drivers",
+    icon: UserCheck,
+  },
+  {
     title: "Bus Management",
     icon: Bus,
     children: [
