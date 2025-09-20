@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/auth-context";
+import { useSidebar } from "@/contexts/sidebar-context";
 import { useRouter } from "next/navigation";
 
 interface SidebarProps {
@@ -119,9 +120,9 @@ const navigation: NavItem[] = [
 ];
 
 export function Sidebar({ className }: SidebarProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
   const [openItems, setOpenItems] = React.useState<string[]>([]);
   const { user, logout } = useAuth();
+  const { isCollapsed, toggleSidebar } = useSidebar();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
@@ -152,32 +153,21 @@ export function Sidebar({ className }: SidebarProps) {
   };
 
   return (
-    <>
-      {/* Mobile Menu Button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="fixed top-4 left-4 z-50 lg:hidden"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
-
-      {/* Sidebar */}
-      <div
-        className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
-          isOpen ? "translate-x-0" : "-translate-x-full",
-          className
-        )}
-      >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Bus className="h-5 w-5 text-white" />
-              </div>
+    <div
+      className={cn(
+        "fixed inset-y-0 left-0 z-40 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-all duration-300 ease-in-out",
+        isCollapsed ? "-translate-x-full" : "translate-x-0 w-64",
+        className
+      )}
+    >
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Bus className="h-5 w-5 text-white" />
+            </div>
+            {!isCollapsed && (
               <div>
                 <h1 className="text-lg font-bold text-gray-900 dark:text-white">
                   BusTrack
@@ -186,73 +176,90 @@ export function Sidebar({ className }: SidebarProps) {
                   Admin Panel
                 </p>
               </div>
-            </div>
+            )}
           </div>
+          {!isCollapsed && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleSidebar}
+              className="hidden lg:flex"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {navigation.map((item) => (
-              <NavItem
-                key={item.title}
-                item={item}
-                openItems={openItems}
-                onToggle={toggleItem}
-              />
-            ))}
-          </nav>
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          {navigation.map((item) => (
+            <NavItem
+              key={item.title}
+              item={item}
+              openItems={openItems}
+              onToggle={toggleItem}
+              isCollapsed={isCollapsed}
+            />
+          ))}
+        </nav>
 
-          {/* User Profile */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start p-3 h-auto hover:bg-gray-100 dark:hover:bg-gray-800"
-                >
-                  <div className="flex items-center space-x-3 w-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatar} />
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm">
-                        {user?.name ? getInitials(user.name) : "A"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 text-left min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {user?.name || "Admin User"}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {user?.email || "admin@school.com"}
-                      </p>
-                    </div>
-                    <ChevronDown className="h-4 w-4 text-gray-400" />
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <UserCheck className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <HelpCircle className="mr-2 h-4 w-4" />
-                  Help
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        {/* User Profile */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-start p-3 h-auto hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <div className="flex items-center space-x-3 w-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.avatar} />
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm">
+                      {user?.name ? getInitials(user.name) : "A"}
+                    </AvatarFallback>
+                  </Avatar>
+                  {!isCollapsed && (
+                    <>
+                      <div className="flex-1 text-left min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {user?.name || "Admin User"}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {user?.email || "admin@school.com"}
+                        </p>
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                    </>
+                  )}
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <UserCheck className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <HelpCircle className="mr-2 h-4 w-4" />
+                Help
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-          {/* Theme Toggle */}
+        {/* Theme Toggle */}
+        {!isCollapsed && (
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -295,17 +302,9 @@ export function Sidebar({ className }: SidebarProps) {
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Overlay for mobile */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-    </>
+    </div>
   );
 }
 
@@ -313,9 +312,10 @@ interface NavItemProps {
   item: NavItem;
   openItems: string[];
   onToggle: (title: string) => void;
+  isCollapsed: boolean;
 }
 
-function NavItem({ item, openItems, onToggle }: NavItemProps) {
+function NavItem({ item, openItems, onToggle, isCollapsed }: NavItemProps) {
   const router = useRouter();
   const isOpen = openItems.includes(item.title);
   const hasChildren = item.children && item.children.length > 0;
@@ -332,32 +332,40 @@ function NavItem({ item, openItems, onToggle }: NavItemProps) {
     <div>
       <Button
         variant="ghost"
-        className="w-full justify-start p-3 h-auto hover:bg-gray-100 dark:hover:bg-gray-800"
+        className={cn(
+          "w-full justify-start p-3 h-auto hover:bg-gray-100 dark:hover:bg-gray-800",
+          isCollapsed && "justify-center px-2"
+        )}
         onClick={handleClick}
+        title={isCollapsed ? item.title : undefined}
       >
         <div className="flex items-center space-x-3 w-full">
           <item.icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <span className="flex-1 text-left text-gray-700 dark:text-gray-300">
-            {item.title}
-          </span>
-          {item.badge && (
-            <Badge variant="secondary" className="text-xs">
-              {item.badge}
-            </Badge>
-          )}
-          {hasChildren && (
-            <div className="text-gray-400">
-              {isOpen ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
+          {!isCollapsed && (
+            <>
+              <span className="flex-1 text-left text-gray-700 dark:text-gray-300">
+                {item.title}
+              </span>
+              {item.badge && (
+                <Badge variant="secondary" className="text-xs">
+                  {item.badge}
+                </Badge>
               )}
-            </div>
+              {hasChildren && (
+                <div className="text-gray-400">
+                  {isOpen ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </Button>
 
-      {hasChildren && (
+      {hasChildren && !isCollapsed && (
         <Collapsible open={isOpen}>
           <CollapsibleContent className="ml-6 space-y-1">
             {item.children?.map((child) => (
