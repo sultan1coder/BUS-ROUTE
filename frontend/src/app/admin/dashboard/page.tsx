@@ -49,20 +49,24 @@ function AdminDashboardContent() {
       setIsLoading(true);
       setError(null);
 
-      // Fetch dashboard data and recent activities in parallel
-      const [dashboardResponse, activitiesResponse] = await Promise.all([
-        AdminApiService.getDashboardData(),
-        AdminApiService.getRecentActivities(4),
-      ]);
+      // Fetch dashboard data
+      const dashboardResponse = await AdminApiService.getDashboardData();
 
-      // Extract stats from dashboard data
-      if (dashboardResponse && dashboardResponse.stats) {
-        setStats(dashboardResponse.stats);
+      // Extract stats from dashboard data - backend returns overview object
+      if (dashboardResponse && dashboardResponse.overview) {
+        setStats({
+          totalUsers: dashboardResponse.overview.totalUsers,
+          totalBuses: dashboardResponse.overview.totalBuses,
+          totalDrivers: dashboardResponse.overview.totalDrivers,
+          totalStudents: dashboardResponse.overview.totalStudents,
+          activeTrips: dashboardResponse.overview.activeTrips,
+          activeAlerts: dashboardResponse.overview.activeAlerts,
+        });
       }
 
-      // Extract activities
-      if (activitiesResponse && activitiesResponse.activities) {
-        setActivities(activitiesResponse.activities);
+      // Extract activities from dashboard data
+      if (dashboardResponse && dashboardResponse.recentActivities) {
+        setActivities(dashboardResponse.recentActivities);
       }
     } catch (err: unknown) {
       console.error("Failed to load dashboard data:", err);
@@ -71,37 +75,9 @@ function AdminDashboardContent() {
           ? err.message
           : "Failed to load dashboard data. Please try again.";
       setError(errorMessage);
-
-      // Fallback to mock data if API fails
-      setStats({
-        totalUsers: 245,
-        totalBuses: 12,
-        totalDrivers: 15,
-        totalStudents: 180,
-        activeTrips: 8,
-        activeAlerts: 2,
-      });
-
-      // Mock activities as fallback
-      setActivities([
-        {
-          id: "1",
-          type: "INFO",
-          description: "System initialized",
-          timestamp: new Date().toISOString(),
-        },
-      ]);
     } finally {
       setIsLoading(false);
     }
-    setStats({
-      totalUsers: 245,
-      totalBuses: 12,
-      totalDrivers: 15,
-      totalStudents: 180,
-      activeTrips: 8,
-      activeAlerts: 2,
-    });
   };
 
   const handleRefresh = async () => {

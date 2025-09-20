@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ProtectedRoute } from "@/components/auth/protected-route";
@@ -41,7 +41,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Users,
   Plus,
@@ -51,9 +50,6 @@ import {
   Trash2,
   UserCheck,
   UserX,
-  Mail,
-  Phone,
-  Calendar,
   Shield,
   MoreHorizontal,
   RefreshCw,
@@ -74,7 +70,6 @@ import {
   ToastTitle,
   ToastDescription,
 } from "@/components/ui/toast";
-import { useState as useToastState } from "react";
 
 interface User {
   id: string;
@@ -92,14 +87,16 @@ interface User {
 interface UserStats {
   totalUsers: number;
   activeUsers: number;
-  inactiveUsers: number;
   usersByRole: { role: string; count: number }[];
+  recentRegistrations: number;
+  userGrowth: Array<{
+    date: string;
+    count: number;
+  }>;
+  topActiveUsers: any[];
 }
 
 function UserManagementContent() {
-  const { user: currentUser } = useAuth();
-  const router = useRouter();
-
   // State management
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -135,51 +132,66 @@ function UserManagementContent() {
     password: "",
   });
 
+  // Toast helper
+  const showToast = useCallback(
+    (message: string, type: "success" | "error" = "success") => {
+      setToastMessage(message);
+      setToastType(type);
+      setIsToastVisible(true);
+      setTimeout(() => setIsToastVisible(false), 3000);
+    },
+    []
+  );
+
   // Load users data
-  const loadUsers = async (page = 1) => {
-    try {
-      setIsRefreshing(true);
-      setError(null);
+  const loadUsers = useCallback(
+    async (page = 1) => {
+      try {
+        setIsRefreshing(true);
+        setError(null);
 
-      const filters: any = {
-        page,
-        limit: 10,
-      };
+        const filters: Record<string, unknown> = {
+          page,
+          limit: 10,
+        };
 
-      if (searchTerm) filters.search = searchTerm;
-      if (roleFilter !== "all") filters.role = roleFilter;
-      if (statusFilter !== "all") filters.isActive = statusFilter === "active";
+        if (searchTerm) filters.search = searchTerm;
+        if (roleFilter !== "all") filters.role = roleFilter;
+        if (statusFilter !== "all")
+          filters.isActive = statusFilter === "active";
 
-      const response = await AdminApiService.getAllUsers(filters);
+        const response = await AdminApiService.getAllUsers(filters);
 
-      setUsers(response.data || []);
-      setCurrentPage(response.meta?.page || 1);
-      setTotalPages(response.meta?.totalPages || 1);
-    } catch (err: any) {
-      console.error("Failed to load users:", err);
-      setError(err.response?.data?.message || "Failed to load users");
-      showToast("Failed to load users", "error");
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  };
+        setUsers(response.data || []);
+        setCurrentPage(response.meta?.page || 1);
+        setTotalPages(response.meta?.totalPages || 1);
+      } catch (err: unknown) {
+        console.error("Failed to load users:", err);
+        setError(err instanceof Error ? err.message : "Failed to load users");
+        showToast("Failed to load users", "error");
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
+    },
+    [searchTerm, roleFilter, statusFilter, showToast]
+  );
 
   // Load user statistics
-  const loadUserStats = async () => {
+  const loadUserStats = useCallback(async () => {
     try {
       const response = await AdminApiService.getUserAnalytics();
       setStats(response);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to load user stats:", err);
     }
-  };
+  }, []);
 
   // Initialize data
   useEffect(() => {
     loadUsers();
     loadUserStats();
-  }, []);
+  }, [loadUsers, loadUserStats]);
 
   // Handle search and filters
   useEffect(() => {
@@ -187,22 +199,11 @@ function UserManagementContent() {
       loadUsers(1);
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchTerm, roleFilter, statusFilter]);
+  }, [searchTerm, roleFilter, statusFilter, loadUsers]);
 
   // Form handlers
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Toast helper
-  const showToast = (
-    message: string,
-    type: "success" | "error" = "success"
-  ) => {
-    setToastMessage(message);
-    setToastType(type);
-    setIsToastVisible(true);
-    setTimeout(() => setIsToastVisible(false), 3000);
   };
 
   const resetForm = () => {
@@ -227,7 +228,7 @@ function UserManagementContent() {
       );
       setIsCreateDialogOpen(false);
       resetForm();
-    } catch (err: any) {
+    } catch (err: unknown) {
       showToast("Failed to create user", "error");
     }
   };
@@ -248,7 +249,7 @@ function UserManagementContent() {
       setIsEditDialogOpen(false);
       resetForm();
       loadUsers(currentPage);
-    } catch (err: any) {
+    } catch (err: unknown) {
       showToast("Failed to update user", "error");
     }
   };
@@ -265,7 +266,7 @@ function UserManagementContent() {
       }
       loadUsers(currentPage);
       loadUserStats();
-    } catch (err: any) {
+    } catch (err: unknown) {
       showToast(
         `Failed to ${isActive ? "deactivate" : "reactivate"} user`,
         "error"
@@ -274,13 +275,13 @@ function UserManagementContent() {
   };
 
   // Delete user
-  const handleDeleteUser = async (userId: string) => {
+  const handleDeleteUser = async (_userId: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
       // Note: Delete functionality would be implemented
       showToast("User deletion would be implemented here", "success");
-    } catch (err: any) {
+    } catch (err: unknown) {
       showToast("Failed to delete user", "error");
     }
   };
@@ -292,7 +293,7 @@ function UserManagementContent() {
       showToast("Bulk activation would be implemented here", "success");
       setSelectedUsers([]);
       loadUsers(currentPage);
-    } catch (err: any) {
+    } catch (err: unknown) {
       showToast("Failed to activate selected users", "error");
     }
   };
@@ -303,7 +304,7 @@ function UserManagementContent() {
       showToast("Bulk deactivation would be implemented here", "success");
       setSelectedUsers([]);
       loadUsers(currentPage);
-    } catch (err: any) {
+    } catch (err: unknown) {
       showToast("Failed to deactivate selected users", "error");
     }
   };
@@ -544,7 +545,7 @@ function UserManagementContent() {
             </CardHeader>
             <CardContent className="text-white">
               <div className="text-2xl font-bold">
-                {stats?.inactiveUsers || 0}
+                {(stats?.totalUsers || 0) - (stats?.activeUsers || 0)}
               </div>
             </CardContent>
           </Card>

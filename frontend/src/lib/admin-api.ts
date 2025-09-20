@@ -11,9 +11,13 @@ export interface DashboardStats {
 }
 
 export interface DashboardData {
-  stats: DashboardStats;
+  overview: DashboardStats;
+  userAnalytics: UserAnalytics;
+  fleetAnalytics: FleetAnalytics;
+  safetyAnalytics: SafetyAnalytics;
+  communicationAnalytics: CommunicationAnalytics;
+  performanceMetrics: PerformanceMetrics;
   recentActivities: Activity[];
-  systemHealth: SystemHealth;
 }
 
 export interface Activity {
@@ -37,36 +41,35 @@ export interface SystemHealth {
 export interface UserAnalytics {
   totalUsers: number;
   activeUsers: number;
-  newUsersToday: number;
-  newUsersThisWeek: number;
-  userGrowth: Array<{
-    date: string;
-    count: number;
-  }>;
   usersByRole: Array<{
     role: string;
     count: number;
   }>;
+  recentRegistrations: number;
+  userGrowth: Array<{
+    date: string;
+    count: number;
+  }>;
+  topActiveUsers: any[];
 }
 
 export interface FleetAnalytics {
   totalBuses: number;
   activeBuses: number;
-  busesInMaintenance: number;
-  averageUtilization: number;
-  fleetEfficiency: number;
-  busStatus: Array<{
+  busesByStatus: Array<{
     status: string;
     count: number;
   }>;
+  averageBusUtilization: number;
+  maintenanceAlerts: number;
+  fuelEfficiency: number;
 }
 
 export interface SafetyAnalytics {
   totalAlerts: number;
-  activeAlerts: number;
-  resolvedAlerts: number;
   criticalAlerts: number;
-  alertResponseTime: number;
+  resolvedAlerts: number;
+  averageResponseTime: number;
   safetyScore: number;
   alertsByType: Array<{
     type: string;
@@ -77,12 +80,21 @@ export interface SafetyAnalytics {
 export interface CommunicationAnalytics {
   totalMessages: number;
   messagesToday: number;
-  messagesThisWeek: number;
+  responseRate: number;
   averageResponseTime: number;
-  communicationChannels: Array<{
-    channel: string;
-    usage: number;
+  messagesByType: Array<{
+    type: string;
+    count: number;
   }>;
+}
+
+export interface PerformanceMetrics {
+  systemUptime: number;
+  averageResponseTime: number;
+  databasePerformance: number;
+  memoryUsage: number;
+  cpuUsage: number;
+  diskUsage: number;
 }
 
 // Admin API Service Class
