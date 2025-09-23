@@ -74,6 +74,7 @@ import {
   GraduationCap,
   Car,
   Home,
+  User,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -240,6 +241,7 @@ function UserManagementContent() {
 
   // Create user
   const handleCreateUser = async () => {
+    console.log("Create user button clicked!"); // Debug log
     try {
       // Note: User creation would typically be handled by a separate API
       // For now, we'll show a placeholder
@@ -431,177 +433,248 @@ function UserManagementContent() {
                   onOpenChange={setIsCreateDialogOpen}
                 >
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 group">
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 group cursor-pointer">
                       <UserPlus className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-200" />
                       Add User
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
-                    <DialogHeader className="space-y-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
-                          <UserPlus className="h-5 w-5 text-white" />
+                  <DialogContent className="sm:max-w-[700px] max-h-[90vh] bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 backdrop-blur-xl border-0 shadow-2xl overflow-hidden flex flex-col">
+                    <DialogHeader className="space-y-4 pb-6">
+                      <div className="flex items-center space-x-4">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl blur-lg opacity-30"></div>
+                          <div className="relative p-3 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl shadow-lg">
+                            <UserPlus className="h-6 w-6 text-white" />
+                          </div>
                         </div>
                         <div>
-                          <DialogTitle className="text-2xl font-bold text-gray-800">
+                          <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-slate-800 via-emerald-700 to-cyan-700 bg-clip-text text-transparent">
                             Create New User
                           </DialogTitle>
-                          <DialogDescription className="text-gray-600">
+                          <DialogDescription className="text-slate-600 text-lg font-medium">
                             Add a new user to the system with appropriate role
-                            and permissions.
+                            and permissions
                           </DialogDescription>
                         </div>
                       </div>
                     </DialogHeader>
-                    <div className="grid gap-6 py-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                          <Label
-                            htmlFor="firstName"
-                            className="text-sm font-semibold text-gray-700"
-                          >
-                            First Name
-                          </Label>
-                          <Input
-                            id="firstName"
-                            value={formData.firstName}
-                            onChange={(e) =>
-                              handleInputChange("firstName", e.target.value)
-                            }
-                            placeholder="Enter first name"
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
-                          />
+
+                    <div className="space-y-8 py-4 flex-1 overflow-y-auto">
+                      {/* Personal Information Section */}
+                      <div className="space-y-6">
+                        <div className="flex items-center space-x-3 pb-2 border-b border-slate-200">
+                          <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg">
+                            <Users className="h-4 w-4 text-white" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-slate-700">
+                            Personal Information
+                          </h3>
                         </div>
-                        <div className="space-y-3">
-                          <Label
-                            htmlFor="lastName"
-                            className="text-sm font-semibold text-gray-700"
-                          >
-                            Last Name
-                          </Label>
-                          <Input
-                            id="lastName"
-                            value={formData.lastName}
-                            onChange={(e) =>
-                              handleInputChange("lastName", e.target.value)
-                            }
-                            placeholder="Enter last name"
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
-                          />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-3">
+                            <Label
+                              htmlFor="firstName"
+                              className="text-sm font-semibold text-slate-700 flex items-center"
+                            >
+                              <User className="h-4 w-4 mr-2 text-blue-500" />
+                              First Name
+                            </Label>
+                            <Input
+                              id="firstName"
+                              value={formData.firstName}
+                              onChange={(e) =>
+                                handleInputChange("firstName", e.target.value)
+                              }
+                              placeholder="Enter first name"
+                              className="h-12 border-2 border-slate-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900 placeholder:text-slate-500"
+                            />
+                          </div>
+                          <div className="space-y-3">
+                            <Label
+                              htmlFor="lastName"
+                              className="text-sm font-semibold text-slate-700 flex items-center"
+                            >
+                              <User className="h-4 w-4 mr-2 text-blue-500" />
+                              Last Name
+                            </Label>
+                            <Input
+                              id="lastName"
+                              value={formData.lastName}
+                              onChange={(e) =>
+                                handleInputChange("lastName", e.target.value)
+                              }
+                              placeholder="Enter last name"
+                              className="h-12 border-2 border-slate-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900 placeholder:text-slate-500"
+                            />
+                          </div>
                         </div>
                       </div>
-                      <div className="space-y-3">
-                        <Label
-                          htmlFor="email"
-                          className="text-sm font-semibold text-gray-700"
-                        >
-                          Email Address
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) =>
-                            handleInputChange("email", e.target.value)
-                          }
-                          placeholder="Enter email address"
-                          className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
-                        />
+
+                      {/* Contact Information Section */}
+                      <div className="space-y-6">
+                        <div className="flex items-center space-x-3 pb-2 border-b border-slate-200">
+                          <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
+                            <Mail className="h-4 w-4 text-white" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-slate-700">
+                            Contact Information
+                          </h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-3">
+                            <Label
+                              htmlFor="email"
+                              className="text-sm font-semibold text-slate-700 flex items-center"
+                            >
+                              <Mail className="h-4 w-4 mr-2 text-purple-500" />
+                              Email Address
+                            </Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              value={formData.email}
+                              onChange={(e) =>
+                                handleInputChange("email", e.target.value)
+                              }
+                              placeholder="Enter email address"
+                              className="h-12 border-2 border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900 placeholder:text-slate-500"
+                            />
+                          </div>
+                          <div className="space-y-3">
+                            <Label
+                              htmlFor="phone"
+                              className="text-sm font-semibold text-slate-700 flex items-center"
+                            >
+                              <Phone className="h-4 w-4 mr-2 text-purple-500" />
+                              Phone Number
+                            </Label>
+                            <Input
+                              id="phone"
+                              value={formData.phone}
+                              onChange={(e) =>
+                                handleInputChange("phone", e.target.value)
+                              }
+                              placeholder="Enter phone number"
+                              className="h-12 border-2 border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900 placeholder:text-slate-500"
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <div className="space-y-3">
-                        <Label
-                          htmlFor="phone"
-                          className="text-sm font-semibold text-gray-700"
-                        >
-                          Phone Number
-                        </Label>
-                        <Input
-                          id="phone"
-                          value={formData.phone}
-                          onChange={(e) =>
-                            handleInputChange("phone", e.target.value)
-                          }
-                          placeholder="Enter phone number"
-                          className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
-                        />
-                      </div>
-                      <div className="space-y-3">
-                        <Label
-                          htmlFor="role"
-                          className="text-sm font-semibold text-gray-700"
-                        >
-                          User Role
-                        </Label>
-                        <Select
-                          value={formData.role}
-                          onValueChange={(value) =>
-                            handleInputChange("role", value)
-                          }
-                        >
-                          <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200">
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="PARENT">
-                              <div className="flex items-center">
-                                <Home className="h-4 w-4 mr-2 text-purple-500" />
-                                Parent
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="DRIVER">
-                              <div className="flex items-center">
-                                <Car className="h-4 w-4 mr-2 text-green-500" />
-                                Driver
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="SCHOOL_STAFF">
-                              <div className="flex items-center">
-                                <GraduationCap className="h-4 w-4 mr-2 text-blue-500" />
-                                School Staff
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="ADMIN">
-                              <div className="flex items-center">
-                                <Crown className="h-4 w-4 mr-2 text-red-500" />
-                                Administrator
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-3">
-                        <Label
-                          htmlFor="password"
-                          className="text-sm font-semibold text-gray-700"
-                        >
-                          Password
-                        </Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={formData.password}
-                          onChange={(e) =>
-                            handleInputChange("password", e.target.value)
-                          }
-                          placeholder="Enter password"
-                          className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
-                        />
+
+                      {/* Role & Security Section */}
+                      <div className="space-y-6">
+                        <div className="flex items-center space-x-3 pb-2 border-b border-slate-200">
+                          <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg">
+                            <Shield className="h-4 w-4 text-white" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-slate-700">
+                            Role & Security
+                          </h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-3">
+                            <Label
+                              htmlFor="role"
+                              className="text-sm font-semibold text-slate-700 flex items-center"
+                            >
+                              <Crown className="h-4 w-4 mr-2 text-orange-500" />
+                              User Role
+                            </Label>
+                            <Select
+                              value={formData.role}
+                              onValueChange={(value) =>
+                                handleInputChange("role", value)
+                              }
+                            >
+                              <SelectTrigger className="h-12 border-2 border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900">
+                                <SelectValue placeholder="Select user role" />
+                              </SelectTrigger>
+                              <SelectContent className="rounded-xl border-0 shadow-xl">
+                                <SelectItem value="PARENT" className="py-3">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="p-1 bg-purple-100 rounded-lg">
+                                      <Home className="h-4 w-4 text-purple-600" />
+                                    </div>
+                                    <span className="font-medium">Parent</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="DRIVER" className="py-3">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="p-1 bg-green-100 rounded-lg">
+                                      <Car className="h-4 w-4 text-green-600" />
+                                    </div>
+                                    <span className="font-medium">Driver</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem
+                                  value="SCHOOL_STAFF"
+                                  className="py-3"
+                                >
+                                  <div className="flex items-center space-x-3">
+                                    <div className="p-1 bg-blue-100 rounded-lg">
+                                      <GraduationCap className="h-4 w-4 text-blue-600" />
+                                    </div>
+                                    <span className="font-medium">
+                                      School Staff
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="ADMIN" className="py-3">
+                                  <div className="flex items-center space-x-3">
+                                    <div className="p-1 bg-red-100 rounded-lg">
+                                      <Crown className="h-4 w-4 text-red-600" />
+                                    </div>
+                                    <span className="font-medium">
+                                      Administrator
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-3">
+                            <Label
+                              htmlFor="password"
+                              className="text-sm font-semibold text-slate-700 flex items-center"
+                            >
+                              <Shield className="h-4 w-4 mr-2 text-orange-500" />
+                              Password
+                            </Label>
+                            <Input
+                              id="password"
+                              type="password"
+                              value={formData.password}
+                              onChange={(e) =>
+                                handleInputChange("password", e.target.value)
+                              }
+                              placeholder="Enter secure password"
+                              className="h-12 border-2 border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900 placeholder:text-slate-500"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <DialogFooter className="space-x-3">
+
+                    <DialogFooter className="pt-6 border-t border-slate-200 space-x-4 bg-white/80 backdrop-blur-sm -mx-6 -mb-6 px-6 pb-6 sticky bottom-0 z-30">
                       <Button
                         variant="outline"
                         onClick={() => {
                           setIsCreateDialogOpen(false);
                           resetForm();
                         }}
-                        className="border-gray-300 hover:border-gray-400 transition-all duration-200"
+                        className="h-12 px-8 border-2 border-slate-300 hover:border-slate-400 hover:bg-red-400 transition-all duration-300 rounded-xl font-semibold bg-red-500 shadow-md hover:shadow-lg z-10 relative cursor-pointer"
                       >
+                        <XCircle className="h-4 w-4 mr-2" />
                         Cancel
                       </Button>
                       <Button
                         onClick={handleCreateUser}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                        className="h-12 px-8 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer rounded-xl font-semibold text-white z-20 relative border-2 border-emerald-400 hover:border-emerald-500 min-w-[140px]"
+                        type="button"
+                        style={{ pointerEvents: "auto" }}
                       >
                         <UserPlus className="h-4 w-4 mr-2" />
                         Create User

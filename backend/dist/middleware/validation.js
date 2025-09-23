@@ -606,7 +606,9 @@ exports.validateUUID = [
     (0, express_validator_1.param)("id").isLength({ min: 1 }).withMessage("Valid ID is required"),
 ];
 exports.validateSchoolId = [
-    (0, express_validator_1.param)("schoolId").isLength({ min: 1 }).withMessage("Valid school ID is required"),
+    (0, express_validator_1.param)("schoolId")
+        .isLength({ min: 1 })
+        .withMessage("Valid school ID is required"),
 ];
 // Query parameter validation
 exports.validatePagination = [
