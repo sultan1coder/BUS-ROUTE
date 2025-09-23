@@ -436,180 +436,146 @@ function UserManagementContent() {
                       Add User
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
-                    <DialogHeader className="space-y-3">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
-                          <UserPlus className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <DialogTitle className="text-2xl font-bold text-gray-800">
-                            Create New User
-                          </DialogTitle>
-                          <DialogDescription className="text-gray-600">
-                            Add a new user to the system with appropriate role
-                            and permissions.
-                          </DialogDescription>
-                        </div>
+                <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
+                  <DialogHeader className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
+                        <UserPlus className="h-5 w-5 text-white" />
                       </div>
-                    </DialogHeader>
-                    <div className="grid gap-6 py-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                          <Label
-                            htmlFor="firstName"
-                            className="text-sm font-semibold text-gray-700"
-                          >
-                            First Name
-                          </Label>
-                          <Input
-                            id="firstName"
-                            value={formData.firstName}
-                            onChange={(e) =>
-                              handleInputChange("firstName", e.target.value)
-                            }
-                            placeholder="Enter first name"
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
-                          />
-                        </div>
-                        <div className="space-y-3">
-                          <Label
-                            htmlFor="lastName"
-                            className="text-sm font-semibold text-gray-700"
-                          >
-                            Last Name
-                          </Label>
-                          <Input
-                            id="lastName"
-                            value={formData.lastName}
-                            onChange={(e) =>
-                              handleInputChange("lastName", e.target.value)
-                            }
-                            placeholder="Enter last name"
-                            className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
-                          />
-                        </div>
+                      <div>
+                        <DialogTitle className="text-2xl font-bold text-gray-800">Create New User</DialogTitle>
+                        <DialogDescription className="text-gray-600">
+                          Add a new user to the system with appropriate role and permissions.
+                        </DialogDescription>
                       </div>
+                    </div>
+                  </DialogHeader>
+                  <div className="grid gap-6 py-6">
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-3">
-                        <Label
-                          htmlFor="email"
-                          className="text-sm font-semibold text-gray-700"
-                        >
-                          Email Address
-                        </Label>
+                        <Label htmlFor="firstName" className="text-sm font-semibold text-gray-700">First Name</Label>
                         <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
+                          id="firstName"
+                          value={formData.firstName}
                           onChange={(e) =>
-                            handleInputChange("email", e.target.value)
+                            handleInputChange("firstName", e.target.value)
                           }
-                          placeholder="Enter email address"
+                          placeholder="Enter first name"
                           className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label
-                          htmlFor="phone"
-                          className="text-sm font-semibold text-gray-700"
-                        >
-                          Phone Number
-                        </Label>
+                        <Label htmlFor="lastName" className="text-sm font-semibold text-gray-700">Last Name</Label>
                         <Input
-                          id="phone"
-                          value={formData.phone}
+                          id="lastName"
+                          value={formData.lastName}
                           onChange={(e) =>
-                            handleInputChange("phone", e.target.value)
+                            handleInputChange("lastName", e.target.value)
                           }
-                          placeholder="Enter phone number"
-                          className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
-                        />
-                      </div>
-                      <div className="space-y-3">
-                        <Label
-                          htmlFor="role"
-                          className="text-sm font-semibold text-gray-700"
-                        >
-                          User Role
-                        </Label>
-                        <Select
-                          value={formData.role}
-                          onValueChange={(value) =>
-                            handleInputChange("role", value)
-                          }
-                        >
-                          <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200">
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="PARENT">
-                              <div className="flex items-center">
-                                <Home className="h-4 w-4 mr-2 text-purple-500" />
-                                Parent
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="DRIVER">
-                              <div className="flex items-center">
-                                <Car className="h-4 w-4 mr-2 text-green-500" />
-                                Driver
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="SCHOOL_STAFF">
-                              <div className="flex items-center">
-                                <GraduationCap className="h-4 w-4 mr-2 text-blue-500" />
-                                School Staff
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="ADMIN">
-                              <div className="flex items-center">
-                                <Crown className="h-4 w-4 mr-2 text-red-500" />
-                                Administrator
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-3">
-                        <Label
-                          htmlFor="password"
-                          className="text-sm font-semibold text-gray-700"
-                        >
-                          Password
-                        </Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={formData.password}
-                          onChange={(e) =>
-                            handleInputChange("password", e.target.value)
-                          }
-                          placeholder="Enter password"
+                          placeholder="Enter last name"
                           className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
                         />
                       </div>
                     </div>
-                    <DialogFooter className="space-x-3">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setIsCreateDialogOpen(false);
-                          resetForm();
-                        }}
-                        className="border-gray-300 hover:border-gray-400 transition-all duration-200"
+                    <div className="space-y-3">
+                      <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email Address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) =>
+                          handleInputChange("email", e.target.value)
+                        }
+                        placeholder="Enter email address"
+                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Label htmlFor="phone" className="text-sm font-semibold text-gray-700">Phone Number</Label>
+                      <Input
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) =>
+                          handleInputChange("phone", e.target.value)
+                        }
+                        placeholder="Enter phone number"
+                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Label htmlFor="role" className="text-sm font-semibold text-gray-700">User Role</Label>
+                      <Select
+                        value={formData.role}
+                        onValueChange={(value) =>
+                          handleInputChange("role", value)
+                        }
                       >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={handleCreateUser}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
-                      >
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Create User
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                        <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200">
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PARENT">
+                            <div className="flex items-center">
+                              <Home className="h-4 w-4 mr-2 text-purple-500" />
+                              Parent
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="DRIVER">
+                            <div className="flex items-center">
+                              <Car className="h-4 w-4 mr-2 text-green-500" />
+                              Driver
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="SCHOOL_STAFF">
+                            <div className="flex items-center">
+                              <GraduationCap className="h-4 w-4 mr-2 text-blue-500" />
+                              School Staff
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="ADMIN">
+                            <div className="flex items-center">
+                              <Crown className="h-4 w-4 mr-2 text-red-500" />
+                              Administrator
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-3">
+                      <Label htmlFor="password" className="text-sm font-semibold text-gray-700">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) =>
+                          handleInputChange("password", e.target.value)
+                        }
+                        placeholder="Enter password"
+                        className="border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter className="space-x-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsCreateDialogOpen(false);
+                        resetForm();
+                      }}
+                      className="border-gray-300 hover:border-gray-400 transition-all duration-200"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleCreateUser}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Create User
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
@@ -629,9 +595,7 @@ function UserManagementContent() {
               </div>
             </CardHeader>
             <CardContent className="relative text-white">
-              <div className="text-3xl font-bold mb-1">
-                {stats?.totalUsers || 0}
-              </div>
+              <div className="text-3xl font-bold mb-1">{stats?.totalUsers || 0}</div>
               <div className="flex items-center text-sm text-white/80">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 <span>All time</span>
@@ -720,10 +684,7 @@ function UserManagementContent() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="space-y-3">
-                <Label
-                  htmlFor="search"
-                  className="text-sm font-semibold text-gray-700"
-                >
+                <Label htmlFor="search" className="text-sm font-semibold text-gray-700">
                   Search Users
                 </Label>
                 <div className="relative group">
@@ -739,10 +700,7 @@ function UserManagementContent() {
               </div>
 
               <div className="space-y-3">
-                <Label
-                  htmlFor="role"
-                  className="text-sm font-semibold text-gray-700"
-                >
+                <Label htmlFor="role" className="text-sm font-semibold text-gray-700">
                   User Role
                 </Label>
                 <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -785,10 +743,7 @@ function UserManagementContent() {
               </div>
 
               <div className="space-y-3">
-                <Label
-                  htmlFor="status"
-                  className="text-sm font-semibold text-gray-700"
-                >
+                <Label htmlFor="status" className="text-sm font-semibold text-gray-700">
                   Account Status
                 </Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -914,33 +869,19 @@ function UserManagementContent() {
                         className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                       />
                     </TableHead>
-                    <TableHead className="font-semibold text-gray-700 p-4">
-                      User
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700 p-4">
-                      Contact
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700 p-4">
-                      Role
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700 p-4">
-                      Status
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700 p-4">
-                      Activity
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-700 p-4">
-                      Created
-                    </TableHead>
-                    <TableHead className="w-12 p-4 text-right font-semibold text-gray-700">
-                      Actions
-                    </TableHead>
+                    <TableHead className="font-semibold text-gray-700 p-4">User</TableHead>
+                    <TableHead className="font-semibold text-gray-700 p-4">Contact</TableHead>
+                    <TableHead className="font-semibold text-gray-700 p-4">Role</TableHead>
+                    <TableHead className="font-semibold text-gray-700 p-4">Status</TableHead>
+                    <TableHead className="font-semibold text-gray-700 p-4">Activity</TableHead>
+                    <TableHead className="font-semibold text-gray-700 p-4">Created</TableHead>
+                    <TableHead className="w-12 p-4 text-right font-semibold text-gray-700">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {users.map((user, index) => (
-                    <TableRow
-                      key={user.id}
+                    <TableRow 
+                      key={user.id} 
                       className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-200 group"
                     >
                       <TableCell className="p-4">
@@ -962,22 +903,17 @@ function UserManagementContent() {
                         <div className="flex items-center space-x-3">
                           <div className="relative">
                             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                              {user.firstName.charAt(0)}
-                              {user.lastName.charAt(0)}
+                              {user.firstName.charAt(0)}{user.lastName.charAt(0)}
                             </div>
-                            <div
-                              className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                                user.isActive ? "bg-green-500" : "bg-gray-400"
-                              }`}
-                            ></div>
+                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+                              user.isActive ? 'bg-green-500' : 'bg-gray-400'
+                            }`}></div>
                           </div>
                           <div>
                             <div className="font-semibold text-gray-900">
                               {user.firstName} {user.lastName}
                             </div>
-                            <div className="text-sm text-gray-500">
-                              ID: {user.id.slice(0, 8)}...
-                            </div>
+                            <div className="text-sm text-gray-500">ID: {user.id.slice(0, 8)}...</div>
                           </div>
                         </div>
                       </TableCell>
@@ -996,36 +932,24 @@ function UserManagementContent() {
                         </div>
                       </TableCell>
                       <TableCell className="p-4">
-                        <Badge
-                          className={`${getRoleColor(
-                            user.role
-                          )} font-medium px-3 py-1`}
-                        >
+                        <Badge className={`${getRoleColor(user.role)} font-medium px-3 py-1`}>
                           <div className="flex items-center">
-                            {user.role === "ADMIN" && (
-                              <Crown className="h-3 w-3 mr-1" />
-                            )}
-                            {user.role === "SCHOOL_STAFF" && (
-                              <GraduationCap className="h-3 w-3 mr-1" />
-                            )}
-                            {user.role === "DRIVER" && (
-                              <Car className="h-3 w-3 mr-1" />
-                            )}
-                            {user.role === "PARENT" && (
-                              <Home className="h-3 w-3 mr-1" />
-                            )}
+                            {user.role === 'ADMIN' && <Crown className="h-3 w-3 mr-1" />}
+                            {user.role === 'SCHOOL_STAFF' && <GraduationCap className="h-3 w-3 mr-1" />}
+                            {user.role === 'DRIVER' && <Car className="h-3 w-3 mr-1" />}
+                            {user.role === 'PARENT' && <Home className="h-3 w-3 mr-1" />}
                             {user.role.replace("_", " ")}
                           </div>
                         </Badge>
                       </TableCell>
                       <TableCell className="p-4">
                         <div className="flex items-center space-x-2">
-                          <Badge
+                          <Badge 
                             variant={user.isActive ? "default" : "secondary"}
                             className={`font-medium px-3 py-1 ${
-                              user.isActive
-                                ? "bg-green-100 text-green-800 border-green-200"
-                                : "bg-gray-100 text-gray-800 border-gray-200"
+                              user.isActive 
+                                ? 'bg-green-100 text-green-800 border-green-200' 
+                                : 'bg-gray-100 text-gray-800 border-gray-200'
                             }`}
                           >
                             <div className="flex items-center">
@@ -1064,17 +988,15 @@ function UserManagementContent() {
                       <TableCell className="p-4">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
+                            <Button 
+                              variant="ghost" 
                               className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-gray-100"
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuLabel className="text-gray-700 font-semibold">
-                              Actions
-                            </DropdownMenuLabel>
+                            <DropdownMenuLabel className="text-gray-700 font-semibold">Actions</DropdownMenuLabel>
                             <DropdownMenuItem
                               onClick={() => openEditDialog(user)}
                               className="cursor-pointer"
@@ -1122,9 +1044,7 @@ function UserManagementContent() {
               <div className="flex items-center justify-between p-6 bg-gray-50/50 border-t border-gray-200">
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <Calendar className="h-4 w-4" />
-                  <span>
-                    Page {currentPage} of {totalPages}
-                  </span>
+                  <span>Page {currentPage} of {totalPages}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -1160,9 +1080,7 @@ function UserManagementContent() {
                   <Edit className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <DialogTitle className="text-2xl font-bold text-gray-800">
-                    Edit User
-                  </DialogTitle>
+                  <DialogTitle className="text-2xl font-bold text-gray-800">Edit User</DialogTitle>
                   <DialogDescription className="text-gray-600">
                     Update user information and permissions.
                   </DialogDescription>
@@ -1172,12 +1090,7 @@ function UserManagementContent() {
             <div className="grid gap-6 py-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-3">
-                  <Label
-                    htmlFor="edit-firstName"
-                    className="text-sm font-semibold text-gray-700"
-                  >
-                    First Name
-                  </Label>
+                  <Label htmlFor="edit-firstName" className="text-sm font-semibold text-gray-700">First Name</Label>
                   <Input
                     id="edit-firstName"
                     value={formData.firstName}
@@ -1188,12 +1101,7 @@ function UserManagementContent() {
                   />
                 </div>
                 <div className="space-y-3">
-                  <Label
-                    htmlFor="edit-lastName"
-                    className="text-sm font-semibold text-gray-700"
-                  >
-                    Last Name
-                  </Label>
+                  <Label htmlFor="edit-lastName" className="text-sm font-semibold text-gray-700">Last Name</Label>
                   <Input
                     id="edit-lastName"
                     value={formData.lastName}
@@ -1205,12 +1113,7 @@ function UserManagementContent() {
                 </div>
               </div>
               <div className="space-y-3">
-                <Label
-                  htmlFor="edit-email"
-                  className="text-sm font-semibold text-gray-700"
-                >
-                  Email Address
-                </Label>
+                <Label htmlFor="edit-email" className="text-sm font-semibold text-gray-700">Email Address</Label>
                 <Input
                   id="edit-email"
                   type="email"
@@ -1225,12 +1128,7 @@ function UserManagementContent() {
                 </p>
               </div>
               <div className="space-y-3">
-                <Label
-                  htmlFor="edit-phone"
-                  className="text-sm font-semibold text-gray-700"
-                >
-                  Phone Number
-                </Label>
+                <Label htmlFor="edit-phone" className="text-sm font-semibold text-gray-700">Phone Number</Label>
                 <Input
                   id="edit-phone"
                   value={formData.phone}
@@ -1239,12 +1137,7 @@ function UserManagementContent() {
                 />
               </div>
               <div className="space-y-3">
-                <Label
-                  htmlFor="edit-role"
-                  className="text-sm font-semibold text-gray-700"
-                >
-                  User Role
-                </Label>
+                <Label htmlFor="edit-role" className="text-sm font-semibold text-gray-700">User Role</Label>
                 <Select
                   value={formData.role}
                   onValueChange={(value) => handleInputChange("role", value)}
@@ -1292,7 +1185,7 @@ function UserManagementContent() {
               >
                 Cancel
               </Button>
-              <Button
+              <Button 
                 onClick={handleUpdateUser}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
               >
