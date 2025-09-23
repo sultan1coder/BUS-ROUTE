@@ -413,6 +413,24 @@ export class AdminApiService {
     }
   }
 
+  // Create user
+  static async createUser(userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    phone?: string;
+  }) {
+    try {
+      const response = await api.post("/auth/register", userData);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      throw error;
+    }
+  }
+
   // Update user
   static async updateUser(userId: string, updateData: any) {
     try {
@@ -564,6 +582,7 @@ export const {
   getAllUsers,
   getAllBuses,
   getAllSchools,
+  createUser,
   updateUser,
   deactivateUser,
   reactivateUser,

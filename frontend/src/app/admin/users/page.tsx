@@ -137,6 +137,7 @@ function UserManagementContent() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   // Toast states
@@ -242,17 +243,84 @@ function UserManagementContent() {
   // Create user
   const handleCreateUser = async () => {
     console.log("Create user button clicked!"); // Debug log
-    try {
-      // Note: User creation would typically be handled by a separate API
-      // For now, we'll show a placeholder
+
+    // Validate form data
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.password ||
+      !formData.role
+    ) {
+      showToast("Please fill in all required fields", "error");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showToast("Please enter a valid email address", "error");
+      return;
+    }
+
+    // Validate password strength
+    if (formData.password.length < 8) {
+      showToast("Password must be at least 8 characters long", "error");
+      return;
+    }
+
+    // Validate password complexity
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+    if (!passwordRegex.test(formData.password)) {
       showToast(
-        "User creation functionality would be implemented here",
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+        "error"
+      );
+      return;
+    }
+
+    // Validate phone number if provided
+    if (formData.phone && formData.phone.trim() !== "") {
+      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+      if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
+        showToast("Please enter a valid phone number", "error");
+        return;
+      }
+    }
+
+    setIsCreatingUser(true);
+
+    try {
+      const userData = {
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        role: formData.role,
+        phone: formData.phone || undefined,
+      };
+
+      const response = await AdminApiService.createUser(userData);
+
+      showToast(
+        `User ${formData.firstName} ${formData.lastName} created successfully!`,
         "success"
       );
+
+      // Close dialog and reset form
       setIsCreateDialogOpen(false);
       resetForm();
-    } catch (err: unknown) {
-      showToast("Failed to create user", "error");
+
+      // Refresh the users list
+      await loadUsers();
+    } catch (err: any) {
+      console.error("Failed to create user:", err);
+      const errorMessage =
+        err?.response?.data?.message || err?.message || "Failed to create user";
+      showToast(errorMessage, "error");
+    } finally {
+      setIsCreatingUser(false);
     }
   };
 
@@ -556,9 +624,12 @@ function UserManagementContent() {
                               onChange={(e) =>
                                 handleInputChange("phone", e.target.value)
                               }
-                              placeholder="Enter phone number"
+                              placeholder="Enter phone number (optional)"
                               className="h-12 border-2 border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900 placeholder:text-slate-500"
                             />
+                            <div className="text-xs text-slate-500 mt-1">
+                              Optional: Enter a valid mobile phone number
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -653,6 +724,10 @@ function UserManagementContent() {
                               placeholder="Enter secure password"
                               className="h-12 border-2 border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900 placeholder:text-slate-500"
                             />
+                            <div className="text-xs text-slate-500 mt-1">
+                              Must be 8+ characters with uppercase, lowercase,
+                              number, and special character
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -672,12 +747,22 @@ function UserManagementContent() {
                       </Button>
                       <Button
                         onClick={handleCreateUser}
-                        className="h-12 px-8 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer rounded-xl font-semibold text-white z-20 relative border-2 border-emerald-400 hover:border-emerald-500 min-w-[140px]"
+                        disabled={isCreatingUser}
+                        className="h-12 px-8 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer rounded-xl font-semibold text-white z-20 relative border-2 border-emerald-400 hover:border-emerald-500 min-w-[140px] disabled:opacity-50 disabled:cursor-not-allowed"
                         type="button"
                         style={{ pointerEvents: "auto" }}
                       >
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Create User
+                        {isCreatingUser ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Creating...
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="h-4 w-4 mr-2" />
+                            Create User
+                          </>
+                        )}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
