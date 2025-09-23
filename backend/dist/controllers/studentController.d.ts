@@ -16,5 +16,8 @@ export declare class StudentController {
     static getStudentManifest: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
     static recordManualAttendance: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
     static getAttendanceReport: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
+    static getAttendanceByDate: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
+    static getGeneralAttendanceStats: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
+    static getAttendanceStatsBySchool: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
 }
 //# sourceMappingURL=studentController.d.ts.map

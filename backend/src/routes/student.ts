@@ -97,13 +97,19 @@ router.post(
   StudentController.recordManualAttendance
 );
 
-// Attendance queries
+// Attendance queries - specific routes first to avoid conflicts
 router.get(
-  "/:id/attendance",
-  validateUUID,
-  validatePagination,
+  "/attendance",
+  requireSchoolStaff,
   handleValidationErrors,
-  StudentController.getStudentAttendance
+  StudentController.getAttendanceByDate
+);
+
+router.get(
+  "/attendance/stats",
+  requireSchoolStaff,
+  handleValidationErrors,
+  StudentController.getGeneralAttendanceStats
 );
 
 router.get(
@@ -111,7 +117,7 @@ router.get(
   requireSchoolStaff,
   validateUUID,
   handleValidationErrors,
-  StudentController.getAttendanceStats
+  StudentController.getAttendanceStatsBySchool
 );
 
 router.get(
@@ -119,6 +125,15 @@ router.get(
   requireSchoolStaff,
   handleValidationErrors,
   StudentController.getAttendanceReport
+);
+
+// Parameterized routes after specific routes
+router.get(
+  "/:id/attendance",
+  validateUUID,
+  validatePagination,
+  handleValidationErrors,
+  StudentController.getStudentAttendance
 );
 
 // Tag management

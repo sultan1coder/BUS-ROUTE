@@ -782,4 +782,29 @@ export class AdminController {
       });
     }
   );
+
+  // Get student analytics
+  static getStudentAnalytics = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      // For now, return mock data
+      const mockAnalytics = {
+        totalStudents: 0,
+        activeStudents: 0,
+        studentsByGrade: [],
+        studentsWithTags: 0,
+        studentsWithoutTags: 0,
+        recentEnrollments: 0,
+        attendanceRate: 0,
+        studentsBySchool: [],
+      };
+
+      res.status(200).json({
+        success: true,
+        data: mockAnalytics,
+      });
+    }
+  );
 }

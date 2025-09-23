@@ -277,6 +277,78 @@ StudentController.getAttendanceReport = (0, errorHandler_1.asyncHandler)(async (
         },
     });
 });
+// Get attendance by date
+StudentController.getAttendanceByDate = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { date } = req.query;
+    if (!date) {
+        res.status(400).json({
+            success: false,
+            message: "Date parameter is required",
+        });
+        return;
+    }
+    // For now, return mock data since we don't have a real attendance system
+    const mockAttendance = [
+        {
+            id: "1",
+            studentId: "STU001",
+            studentName: "John Doe",
+            grade: "8",
+            status: "present",
+            checkInTime: "08:15",
+            checkOutTime: "15:30",
+            notes: "",
+        },
+        {
+            id: "2",
+            studentId: "STU002",
+            studentName: "Sarah Smith",
+            grade: "6",
+            status: "late",
+            checkInTime: "08:45",
+            checkOutTime: "15:30",
+            notes: "Late due to traffic",
+        },
+    ];
+    res.status(200).json({
+        success: true,
+        data: mockAttendance,
+    });
+});
+// Get attendance stats (general)
+StudentController.getGeneralAttendanceStats = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    // For now, return mock data
+    const mockStats = {
+        totalStudents: 2,
+        presentToday: 2,
+        absentToday: 0,
+        lateToday: 1,
+        attendanceRate: 100,
+        averageCheckInTime: "08:30",
+    };
+    res.status(200).json({
+        success: true,
+        data: mockStats,
+    });
+});
+// Get attendance stats by school
+StudentController.getAttendanceStatsBySchool = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { schoolId } = req.params;
+    // For now, return mock data
+    const mockStats = {
+        schoolId,
+        totalStudents: 2,
+        presentToday: 2,
+        absentToday: 0,
+        lateToday: 1,
+        attendanceRate: 100,
+        averageCheckInTime: "08:30",
+    };
+    res.status(200).json({
+        success: true,
+        data: mockStats,
+    });
+});
 // Helper function to calculate business days
 function calculateBusinessDays(startDate, endDate) {
     let count = 0;

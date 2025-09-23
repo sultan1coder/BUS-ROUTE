@@ -16,6 +16,7 @@ router.get("/analytics/users", validation_1.handleValidationErrors, adminControl
 router.get("/analytics/fleet", validation_1.handleValidationErrors, adminController_1.AdminController.getFleetAnalytics);
 router.get("/analytics/safety", validation_1.handleValidationErrors, adminController_1.AdminController.getSafetyAnalytics);
 router.get("/analytics/communication", validation_1.handleValidationErrors, adminController_1.AdminController.getCommunicationAnalytics);
+router.get("/analytics/students", validation_1.handleValidationErrors, adminController_1.AdminController.getStudentAnalytics);
 router.get("/analytics/performance", validation_1.handleValidationErrors, adminController_1.AdminController.getPerformanceMetrics);
 // Reports and exports
 router.get("/reports/:reportType", validation_1.handleValidationErrors, adminController_1.AdminController.getDetailedReport);

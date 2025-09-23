@@ -537,4 +537,22 @@ AdminController.getSchoolById = (0, errorHandler_1.asyncHandler)(async (req, res
         data: school,
     });
 });
+// Get student analytics
+AdminController.getStudentAnalytics = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    // For now, return mock data
+    const mockAnalytics = {
+        totalStudents: 0,
+        activeStudents: 0,
+        studentsByGrade: [],
+        studentsWithTags: 0,
+        studentsWithoutTags: 0,
+        recentEnrollments: 0,
+        attendanceRate: 0,
+        studentsBySchool: [],
+    };
+    res.status(200).json({
+        success: true,
+        data: mockAnalytics,
+    });
+});
 //# sourceMappingURL=adminController.js.map

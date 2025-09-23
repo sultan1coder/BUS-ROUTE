@@ -25,5 +25,6 @@ export declare class AdminController {
     static updateSchool: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
     static deleteSchool: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
     static getSchoolById: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
+    static getStudentAnalytics: (req: import("express").Request, res: Response, next: import("express").NextFunction) => void;
 }
 //# sourceMappingURL=adminController.d.ts.map

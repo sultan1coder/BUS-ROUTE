@@ -8,12 +8,14 @@ import { UserRole } from "@/types";
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: UserRole;
+  allowedRoles?: UserRole[];
   fallbackPath?: string;
 }
 
 export function ProtectedRoute({
   children,
   requiredRole,
+  allowedRoles,
   fallbackPath = "/auth/login",
 }: ProtectedRouteProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -26,7 +28,18 @@ export function ProtectedRoute({
         return;
       }
 
+      // Check role access
+      let hasAccess = true;
+
       if (requiredRole && user?.role !== requiredRole) {
+        hasAccess = false;
+      }
+
+      if (allowedRoles && user?.role && !allowedRoles.includes(user.role)) {
+        hasAccess = false;
+      }
+
+      if (!hasAccess) {
         // Redirect to appropriate dashboard based on role
         switch (user?.role) {
           case "ADMIN":
@@ -47,7 +60,15 @@ export function ProtectedRoute({
         return;
       }
     }
-  }, [user, isLoading, isAuthenticated, requiredRole, router, fallbackPath]);
+  }, [
+    user,
+    isLoading,
+    isAuthenticated,
+    requiredRole,
+    allowedRoles,
+    router,
+    fallbackPath,
+  ]);
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -62,7 +83,20 @@ export function ProtectedRoute({
   }
 
   // Don't render children if not authenticated or wrong role
-  if (!isAuthenticated || (requiredRole && user?.role !== requiredRole)) {
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  // Check role access for rendering
+  let hasAccess = true;
+  if (requiredRole && user?.role !== requiredRole) {
+    hasAccess = false;
+  }
+  if (allowedRoles && user?.role && !allowedRoles.includes(user.role)) {
+    hasAccess = false;
+  }
+
+  if (!hasAccess) {
     return null;
   }
 
@@ -72,7 +106,11 @@ export function ProtectedRoute({
 // Higher-order component for protecting entire pages
 export function withAuth<T extends {}>(
   Component: React.ComponentType<T>,
-  options: { requiredRole?: UserRole; fallbackPath?: string } = {}
+  options: {
+    requiredRole?: UserRole;
+    allowedRoles?: UserRole[];
+    fallbackPath?: string;
+  } = {}
 ) {
   const ProtectedComponent = (props: T) => (
     <ProtectedRoute {...options}>

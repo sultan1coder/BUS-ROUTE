@@ -45,6 +45,11 @@ router.get(
   AdminController.getCommunicationAnalytics
 );
 router.get(
+  "/analytics/students",
+  handleValidationErrors,
+  AdminController.getStudentAnalytics
+);
+router.get(
   "/analytics/performance",
   handleValidationErrors,
   AdminController.getPerformanceMetrics
