@@ -22,17 +22,17 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header with Menu Toggle */}
         <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between ">
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleSidebar}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 cursor-pointer"
             >
               <Menu className="h-5 w-5" />
-              <span className="hidden sm:inline">Menu</span>
+              <span className="hidden sm:inline ">Menu</span>
             </Button>
-            <div className="flex-1" />
+            <div className="flex-1 " />
           </div>
         </header>
 

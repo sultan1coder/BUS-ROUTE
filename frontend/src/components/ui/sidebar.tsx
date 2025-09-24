@@ -188,7 +188,7 @@ export function Sidebar({ className }: SidebarProps) {
               variant="ghost"
               size="sm"
               onClick={toggleSidebar}
-              className="hidden lg:flex"
+              className="hidden lg:flex cursor-pointer"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -196,7 +196,7 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto ">
           {navigation.map((item) => (
             <NavItem
               key={item.title}
@@ -214,50 +214,73 @@ export function Sidebar({ className }: SidebarProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="w-full justify-start p-3 h-auto hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="w-full justify-start p-0 h-auto hover:bg-transparent cursor-pointer group"
               >
-                <div className="flex items-center space-x-3 w-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatar} />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm">
-                      {user?.name ? getInitials(user.name) : "A"}
-                    </AvatarFallback>
-                  </Avatar>
-                  {!isCollapsed && (
-                    <>
-                      <div className="flex-1 text-left min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                          {user?.name || "Admin User"}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {user?.email || "admin@school.com"}
-                        </p>
-                      </div>
-                      <ChevronDown className="h-4 w-4 text-gray-400" />
-                    </>
-                  )}
+                <div className="w-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                  <div className="flex items-center space-x-3 w-full">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12 ring-4 ring-white/20 shadow-lg">
+                        <AvatarImage src={user?.avatar} />
+                        <AvatarFallback className="bg-white/20 backdrop-blur-sm text-white text-lg font-semibold">
+                          {user?.firstName && user?.lastName
+                            ? getInitials(`${user.firstName} ${user.lastName}`)
+                            : "A"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-400 border-2 border-white rounded-full"></div>
+                    </div>
+                    {!isCollapsed && (
+                      <>
+                        <div className="flex-1 text-left min-w-0">
+                          <p className="text-sm font-semibold text-white truncate drop-shadow-sm">
+                            {user?.firstName && user?.lastName
+                              ? `${user.firstName} ${user.lastName}`
+                              : "Admin User"}
+                          </p>
+                          <p className="text-xs text-white/80 truncate drop-shadow-sm">
+                            {user?.email || "admin@school.com"}
+                          </p>
+                          <div className="flex items-center mt-1">
+                            <div className="h-1.5 w-1.5 bg-green-400 rounded-full mr-2"></div>
+                            <span className="text-xs text-white/70 font-medium">
+                              Online
+                            </span>
+                          </div>
+                        </div>
+                        <ChevronDown className="h-4 w-4 text-white/70 group-hover:text-white transition-colors" />
+                      </>
+                    )}
+                  </div>
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <UserCheck className="mr-2 h-4 w-4" />
-                Profile
+            <DropdownMenuContent
+              align="end"
+              className="w-64 bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-xl p-2"
+            >
+              <DropdownMenuLabel className="px-3 py-2 text-sm font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+                My Account
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gradient-to-r from-indigo-200 to-purple-200" />
+              <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 mx-1 my-1">
+                <UserCheck className="mr-3 h-4 w-4 text-indigo-600 " />
+                <span className="font-medium text-indigo-600">Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
+              <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 mx-1 my-1">
+                <Settings className="mr-3 h-4 w-4 text-purple-600" />
+                <span className="font-medium text-purple-600">Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <HelpCircle className="mr-2 h-4 w-4" />
-                Help
+              <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 mx-1 my-1">
+                <HelpCircle className="mr-3 h-4 w-4 text-blue-600" />
+                <span className="font-medium text-blue-600">Help</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
+              <DropdownMenuSeparator className="bg-gradient-to-r from-indigo-200 to-purple-200 my-2" />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="cursor-pointer rounded-lg hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 transition-all duration-200 mx-1 my-1 text-red-600"
+              >
+                <LogOut className="mr-3 h-4 w-4" />
+                <span className="font-medium">Logout</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -276,7 +299,7 @@ export function Sidebar({ className }: SidebarProps) {
                   size="sm"
                   onClick={() => setTheme("light")}
                   className={cn(
-                    "h-8 w-8 p-0",
+                    "h-8 w-8 p-0 cursor-pointer",
                     theme === "light" && "bg-gray-100 dark:bg-gray-800"
                   )}
                 >
@@ -287,7 +310,7 @@ export function Sidebar({ className }: SidebarProps) {
                   size="sm"
                   onClick={() => setTheme("dark")}
                   className={cn(
-                    "h-8 w-8 p-0",
+                    "h-8 w-8 p-0 cursor-pointer",
                     theme === "dark" && "bg-gray-100 dark:bg-gray-800"
                   )}
                 >
@@ -298,7 +321,7 @@ export function Sidebar({ className }: SidebarProps) {
                   size="sm"
                   onClick={() => setTheme("system")}
                   className={cn(
-                    "h-8 w-8 p-0",
+                    "h-8 w-8 p-0 cursor-pointer",
                     theme === "system" && "bg-gray-100 dark:bg-gray-800"
                   )}
                 >
@@ -338,7 +361,7 @@ function NavItem({ item, openItems, onToggle, isCollapsed }: NavItemProps) {
       <Button
         variant="ghost"
         className={cn(
-          "w-full justify-start p-3 h-auto hover:bg-gray-100 dark:hover:bg-gray-800",
+          "w-full justify-start p-3 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer",
           isCollapsed && "justify-center px-2"
         )}
         onClick={handleClick}
@@ -377,7 +400,7 @@ function NavItem({ item, openItems, onToggle, isCollapsed }: NavItemProps) {
               <Button
                 key={child.title}
                 variant="ghost"
-                className="w-full justify-start p-2 h-auto hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="w-full justify-start p-2 h-auto hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                 onClick={() => child.href && router.push(child.href)}
               >
                 <div className="flex items-center space-x-3 w-full">

@@ -147,7 +147,7 @@ function AdminDashboardContent() {
                 Admin Dashboard
               </h1>
               <p className="text-gray-600 font-medium">
-                Welcome back, {user.firstName}! 👋
+                Welcome back, {user?.firstName}! 👋
               </p>
             </div>
           </div>
