@@ -35,6 +35,36 @@ router.get(
   StudentController.getStudents
 );
 
+// Attendance routes must come before /:id route to avoid conflicts
+router.get(
+  "/attendance",
+  requireSchoolStaff,
+  handleValidationErrors,
+  StudentController.getAttendanceByDate
+);
+
+router.get(
+  "/attendance/stats",
+  requireSchoolStaff,
+  handleValidationErrors,
+  StudentController.getGeneralAttendanceStats
+);
+
+router.get(
+  "/attendance/stats/:schoolId",
+  requireSchoolStaff,
+  validateUUID,
+  handleValidationErrors,
+  StudentController.getAttendanceStatsBySchool
+);
+
+router.get(
+  "/attendance/report",
+  requireSchoolStaff,
+  handleValidationErrors,
+  StudentController.getAttendanceReport
+);
+
 router.get(
   "/:id",
   validateUUID,
@@ -97,35 +127,7 @@ router.post(
   StudentController.recordManualAttendance
 );
 
-// Attendance queries - specific routes first to avoid conflicts
-router.get(
-  "/attendance",
-  requireSchoolStaff,
-  handleValidationErrors,
-  StudentController.getAttendanceByDate
-);
-
-router.get(
-  "/attendance/stats",
-  requireSchoolStaff,
-  handleValidationErrors,
-  StudentController.getGeneralAttendanceStats
-);
-
-router.get(
-  "/attendance/stats/:schoolId",
-  requireSchoolStaff,
-  validateUUID,
-  handleValidationErrors,
-  StudentController.getAttendanceStatsBySchool
-);
-
-router.get(
-  "/attendance/report",
-  requireSchoolStaff,
-  handleValidationErrors,
-  StudentController.getAttendanceReport
-);
+// Attendance routes moved above to avoid conflicts with /:id route
 
 // Parameterized routes after specific routes
 router.get(

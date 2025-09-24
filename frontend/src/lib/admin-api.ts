@@ -803,6 +803,7 @@ export class AdminApiService {
       return response.data;
     } catch (error) {
       console.error("Failed to fetch student attendance:", error);
+
       // Return fallback data instead of throwing error
       return [
         {
