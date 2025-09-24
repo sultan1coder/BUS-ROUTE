@@ -8,7 +8,7 @@ const router = (0, express_1.Router)();
 // All routes require authentication
 router.use(auth_1.authenticate);
 // Student CRUD operations
-router.post("/", auth_1.requireSchoolStaff, validation_1.validateStudentData, validation_1.handleValidationErrors, studentController_1.StudentController.createStudent);
+router.post("/", auth_1.requireSchoolStaff, validation_1.validateStudentCreation, validation_1.handleValidationErrors, studentController_1.StudentController.createStudent);
 router.get("/", validation_1.validatePagination, validation_1.handleValidationErrors, studentController_1.StudentController.getStudents);
 // Attendance routes must come before /:id route to avoid conflicts
 router.get("/attendance", auth_1.requireSchoolStaff, validation_1.handleValidationErrors, studentController_1.StudentController.getAttendanceByDate);

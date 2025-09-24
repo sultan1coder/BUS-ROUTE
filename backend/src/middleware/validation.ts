@@ -486,10 +486,11 @@ export const validateStudentCreation = [
     }),
   body("grade").trim().notEmpty().withMessage("Grade is required"),
   body("studentId").trim().notEmpty().withMessage("Student ID is required"),
-  body("schoolId").isUUID().withMessage("Valid school ID is required"),
+  body("schoolId").trim().notEmpty().withMessage("Valid school ID is required"),
   body("parentId")
     .optional()
-    .isUUID()
+    .trim()
+    .notEmpty()
     .withMessage("Valid parent ID is required"),
   body("rfidTag")
     .optional()

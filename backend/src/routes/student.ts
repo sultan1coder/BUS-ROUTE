@@ -8,6 +8,7 @@ import {
 } from "../middleware/auth";
 import {
   validateStudentData,
+  validateStudentCreation,
   validateUUID,
   validatePagination,
   validateAttendanceData,
@@ -23,7 +24,7 @@ router.use(authenticate);
 router.post(
   "/",
   requireSchoolStaff,
-  validateStudentData,
+  validateStudentCreation,
   handleValidationErrors,
   StudentController.createStudent
 );

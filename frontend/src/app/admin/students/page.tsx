@@ -89,6 +89,7 @@ import {
   TrendingDown,
   UserCheck2,
   UserX2,
+  FileText,
   Calendar as CalendarIcon,
   Clock as ClockIcon,
   MapPin as MapPinIcon,
@@ -208,7 +209,11 @@ function StudentManagementContent() {
   const [attendanceDate, setAttendanceDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [attendanceFilter, setAttendanceFilter] = useState<string>("all"); // all, present, absent, late
+  const [attendanceFilter, setAttendanceFilter] = useState<string>("all");
+
+  // Schools state
+  const [schools, setSchools] = useState<any[]>([]);
+  const [isLoadingSchools, setIsLoadingSchools] = useState(false); // all, present, absent, late
 
   // Toast states
   const [toastMessage, setToastMessage] = useState<string>("");
@@ -242,6 +247,43 @@ function StudentManagementContent() {
     },
     []
   );
+
+  // Load schools data
+  const loadSchools = useCallback(async () => {
+    try {
+      setIsLoadingSchools(true);
+      const response = await AdminApiService.getAllSchools();
+      setSchools(response.data || []);
+    } catch (err: any) {
+      console.error("Failed to load schools:", err);
+      // Set mock schools data for demonstration
+      setSchools([
+        {
+          id: "cmfsjrr4e0000ivlwjml45boe",
+          name: "Greenwood Elementary School",
+          address: "123 School Street",
+          city: "Springfield",
+          state: "IL",
+        },
+        {
+          id: "school2",
+          name: "Washington Middle School",
+          address: "456 Education Ave",
+          city: "Springfield",
+          state: "IL",
+        },
+        {
+          id: "school3",
+          name: "Roosevelt High School",
+          address: "789 Learning Blvd",
+          city: "Springfield",
+          state: "IL",
+        },
+      ]);
+    } finally {
+      setIsLoadingSchools(false);
+    }
+  }, []);
 
   // Load students data
   const loadStudents = useCallback(
@@ -381,6 +423,7 @@ function StudentManagementContent() {
 
   // Load data on component mount
   useEffect(() => {
+    loadSchools();
     loadStudents();
     loadStudentStats();
     // Load attendance data after functions are defined
@@ -948,7 +991,460 @@ function StudentManagementContent() {
                     Add Student
                   </Button>
                 </DialogTrigger>
-                {/* Create Student Dialog will be implemented here */}
+                <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
+                  <DialogHeader className="pb-6">
+                    <DialogTitle className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
+                        <UserPlus className="h-6 w-6 text-white" />
+                      </div>
+                      Add New Student
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600 text-base">
+                      Create a new student profile. All required fields are
+                      marked with an asterisk (*).
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-8">
+                    {/* Personal Information Section */}
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <User className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          Personal Information
+                        </h3>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="firstName"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            First Name *
+                          </Label>
+                          <Input
+                            id="firstName"
+                            value={formData.firstName}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                firstName: e.target.value,
+                              })
+                            }
+                            placeholder="Enter student's first name"
+                            className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="lastName"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            Last Name *
+                          </Label>
+                          <Input
+                            id="lastName"
+                            value={formData.lastName}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                lastName: e.target.value,
+                              })
+                            }
+                            placeholder="Enter student's last name"
+                            className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="dateOfBirth"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            Date of Birth *
+                          </Label>
+                          <Input
+                            id="dateOfBirth"
+                            type="date"
+                            value={formData.dateOfBirth}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                dateOfBirth: e.target.value,
+                              })
+                            }
+                            className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="studentId"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            Student ID *
+                          </Label>
+                          <Input
+                            id="studentId"
+                            value={formData.studentId}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                studentId: e.target.value,
+                              })
+                            }
+                            placeholder="Enter unique student ID"
+                            className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Academic Information Section */}
+                    <div className="bg-green-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-green-100 rounded-lg">
+                          <GraduationCap className="h-5 w-5 text-green-600" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          Academic Information
+                        </h3>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="grade"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            Grade Level *
+                          </Label>
+                          <Select
+                            value={formData.grade}
+                            onValueChange={(value) =>
+                              setFormData({ ...formData, grade: value })
+                            }
+                          >
+                            <SelectTrigger className="h-12 bg-white border-2 border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 hover:border-green-300 transition-all duration-200 shadow-sm text-black">
+                              <div className="flex items-center gap-2">
+                                <GraduationCap className="h-4 w-4 text-green-600" />
+                                <SelectValue placeholder="Select grade level" />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border border-green-200 shadow-lg rounded-lg text-black">
+                              {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                                (grade) => (
+                                  <SelectItem
+                                    key={grade}
+                                    value={grade.toString()}
+                                    className="hover:bg-green-50 focus:bg-green-50 cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-3 py-1">
+                                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                        <span className="text-xs font-semibold text-green-700">
+                                          {grade}
+                                        </span>
+                                      </div>
+                                      <span className="font-medium">
+                                        Grade {grade}
+                                      </span>
+                                    </div>
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="schoolId"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            School *
+                          </Label>
+                          <Select
+                            value={formData.schoolId}
+                            onValueChange={(value) =>
+                              setFormData({ ...formData, schoolId: value })
+                            }
+                          >
+                            <SelectTrigger className="h-12 bg-white border-2 border-green-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 hover:border-green-300 transition-all duration-200 shadow-sm">
+                              <div className="flex items-center gap-2">
+                                <School className="h-4 w-4 text-green-600" />
+                                <SelectValue placeholder="Select school" />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border border-green-200 shadow-lg rounded-lg max-h-60">
+                              {isLoadingSchools ? (
+                                <SelectItem
+                                  value=""
+                                  disabled
+                                  className="cursor-not-allowed"
+                                >
+                                  <div className="flex items-center gap-3 py-2">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                                    <span className="text-gray-600">
+                                      Loading schools...
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ) : schools.length > 0 ? (
+                                schools.map((school) => (
+                                  <SelectItem
+                                    key={school.id}
+                                    value={school.id}
+                                    className="hover:bg-green-50 focus:bg-green-50 cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-3 py-2">
+                                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <School className="h-4 w-4 text-green-600" />
+                                      </div>
+                                      <div className="flex flex-col">
+                                        <span className="font-semibold text-gray-900">
+                                          {school.name}
+                                        </span>
+                                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                                          <MapPin className="h-3 w-3" />
+                                          {school.city}, {school.state}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem
+                                  value=""
+                                  disabled
+                                  className="cursor-not-allowed"
+                                >
+                                  <div className="flex items-center gap-3 py-2">
+                                    <AlertCircle className="h-4 w-4 text-gray-400" />
+                                    <span className="text-gray-500">
+                                      No schools available
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contact Information Section */}
+                    <div className="bg-purple-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-purple-100 rounded-lg">
+                          <Phone className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          Parent Contact Information
+                        </h3>
+                        <span className="text-sm text-gray-500 font-normal">
+                          (Optional)
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="parentEmail"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            Parent Email
+                          </Label>
+                          <Input
+                            id="parentEmail"
+                            type="email"
+                            value={formData.parentEmail}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                parentEmail: e.target.value,
+                              })
+                            }
+                            placeholder="parent@example.com"
+                            className="h-11 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="parentPhone"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            Parent Phone
+                          </Label>
+                          <Input
+                            id="parentPhone"
+                            value={formData.parentPhone}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                parentPhone: e.target.value,
+                              })
+                            }
+                            placeholder="(555) 123-4567"
+                            className="h-11 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Identification Tags Section */}
+                    <div className="bg-orange-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-orange-100 rounded-lg">
+                          <Shield className="h-5 w-5 text-orange-600" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          Identification Tags
+                        </h3>
+                        <span className="text-sm text-gray-500 font-normal">
+                          (Optional)
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="rfidTag"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            RFID Tag
+                          </Label>
+                          <Input
+                            id="rfidTag"
+                            value={formData.rfidTag}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                rfidTag: e.target.value,
+                              })
+                            }
+                            placeholder="Enter RFID tag ID"
+                            className="h-11 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="nfcTag"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            NFC Tag
+                          </Label>
+                          <Input
+                            id="nfcTag"
+                            value={formData.nfcTag}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                nfcTag: e.target.value,
+                              })
+                            }
+                            placeholder="Enter NFC tag ID"
+                            className="h-11 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Additional Information Section */}
+                    <div className="bg-indigo-50 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-indigo-100 rounded-lg">
+                          <FileText className="h-5 w-5 text-indigo-600" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          Additional Information
+                        </h3>
+                        <span className="text-sm text-gray-500 font-normal">
+                          (Optional)
+                        </span>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="photo"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            Student Photo URL
+                          </Label>
+                          <Input
+                            id="photo"
+                            value={formData.photo}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                photo: e.target.value,
+                              })
+                            }
+                            placeholder="https://example.com/photo.jpg"
+                            className="h-11 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="medicalInfo"
+                            className="text-sm font-semibold text-gray-700"
+                          >
+                            Medical Information & Allergies
+                          </Label>
+                          <textarea
+                            id="medicalInfo"
+                            value={formData.medicalInfo}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                medicalInfo: e.target.value,
+                              })
+                            }
+                            placeholder="Enter any medical conditions, allergies, or special requirements..."
+                            className="w-full min-h-[120px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <DialogFooter className="flex justify-between items-center pt-6 border-t border-gray-200">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsCreateDialogOpen(false);
+                        resetForm();
+                      }}
+                      className="px-6 py-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleCreateStudent}
+                      disabled={isCreatingStudent}
+                      className="px-8 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                    >
+                      {isCreatingStudent ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Creating Student...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <UserPlus className="h-4 w-4" />
+                          Create Student
+                        </div>
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
               </Dialog>
             </div>
           </div>
@@ -1390,14 +1886,61 @@ function StudentManagementContent() {
                 value={attendanceFilter}
                 onValueChange={setAttendanceFilter}
               >
-                <SelectTrigger className="w-48 h-10 border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900">
-                  <SelectValue placeholder="All statuses" />
+                <SelectTrigger className="w-48 h-12 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 hover:border-blue-300 hover:shadow-lg transition-all duration-300 rounded-xl text-slate-900 font-medium">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-blue-100 rounded-lg">
+                      <Activity className="h-3 w-3 text-blue-600" />
+                    </div>
+                    <SelectValue placeholder="All statuses" />
+                  </div>
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-0 shadow-xl">
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="present">Present</SelectItem>
-                  <SelectItem value="absent">Absent</SelectItem>
-                  <SelectItem value="late">Late</SelectItem>
+                <SelectContent className="bg-white border border-blue-200 shadow-2xl rounded-xl">
+                  <SelectItem
+                    value="all"
+                    className="hover:bg-blue-50 focus:bg-blue-50 cursor-pointer py-2"
+                  >
+                    <div className="flex items-center gap-2 text-black">
+                      <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-blue-700">
+                          A
+                        </span>
+                      </div>
+                      <span className="font-medium">All Statuses</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem
+                    value="present"
+                    className="hover:bg-blue-50 focus:bg-blue-50 cursor-pointer py-2"
+                  >
+                    <div className="flex items-center gap-2 text-black">
+                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                        <CheckCircle2 className="h-3 w-3 text-green-600" />
+                      </div>
+                      <span className="font-medium">Present</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem
+                    value="absent"
+                    className="hover:bg-blue-50 focus:bg-blue-50 cursor-pointer py-2"
+                  >
+                    <div className="flex items-center gap-2 text-black">
+                      <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center">
+                        <XCircle className="h-3 w-3 text-red-600" />
+                      </div>
+                      <span className="font-medium">Absent</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem
+                    value="late"
+                    className="hover:bg-blue-50 focus:bg-blue-50 cursor-pointer py-2"
+                  >
+                    <div className="flex items-center gap-2 text-black">
+                      <div className="w-5 h-5 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <Clock className="h-3 w-3 text-yellow-600" />
+                      </div>
+                      <span className="font-medium">Late</span>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1440,16 +1983,55 @@ function StudentManagementContent() {
                   Grade Level
                 </Label>
                 <Select value={gradeFilter} onValueChange={setGradeFilter}>
-                  <SelectTrigger className="h-12 border-2 border-slate-200 focus:border-green-500 focus:ring-4 focus:ring-green-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900">
-                    <SelectValue placeholder="All grades" />
+                  <SelectTrigger className="h-14 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 focus:border-green-500 focus:ring-4 focus:ring-green-500/20 hover:border-green-300 hover:shadow-lg transition-all duration-300 rounded-xl text-slate-900 font-medium">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <BookOpen className="h-4 w-4 text-green-600" />
+                      </div>
+                      <SelectValue placeholder="All grades" />
+                    </div>
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-0 shadow-xl">
-                    <SelectItem value="all">All Grades</SelectItem>
-                    <SelectItem value="Pre-K">Pre-K</SelectItem>
-                    <SelectItem value="K">Kindergarten</SelectItem>
+                  <SelectContent className="bg-white border border-green-200 shadow-2xl rounded-xl max-h-60 overflow-y-auto">
+                    <SelectItem
+                      value="all"
+                      className="hover:bg-green-50 focus:bg-green-50 cursor-pointer py-3"
+                    >
+                      <div className="flex items-center gap-3 text-black">
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-bold text-green-700">
+                            A
+                          </span>
+                        </div>
+                        <span className="font-medium">All Grades</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem
+                      value="K"
+                      className="hover:bg-green-50 focus:bg-green-50 cursor-pointer py-3"
+                    >
+                      <div className="flex items-center gap-3 text-black">
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center ">
+                          <span className="text-xs font-bold text-green-700">
+                            K
+                          </span>
+                        </div>
+                        <span className="font-medium">Kindergarten</span>
+                      </div>
+                    </SelectItem>
                     {Array.from({ length: 12 }, (_, i) => (
-                      <SelectItem key={i + 1} value={(i + 1).toString()}>
-                        Grade {i + 1}
+                      <SelectItem
+                        key={i + 1}
+                        value={(i + 1).toString()}
+                        className="hover:bg-green-50 focus:bg-green-50 cursor-pointer py-3"
+                      >
+                        <div className="flex items-center gap-3 text-black">
+                          <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                            <span className="text-xs font-bold text-green-700">
+                              {i + 1}
+                            </span>
+                          </div>
+                          <span className="font-medium">Grade {i + 1}</span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1465,13 +2047,50 @@ function StudentManagementContent() {
                   Status
                 </Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="h-12 border-2 border-slate-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900">
-                    <SelectValue placeholder="All statuses" />
+                  <SelectTrigger className="h-14 bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-purple-300 hover:shadow-lg transition-all duration-300 rounded-xl text-slate-900 font-medium">
+                    <div className="flex items-center gap-3 ">
+                      <div className="p-2 bg-purple-100 rounded-lg ">
+                        <UserCheck className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <SelectValue placeholder="All statuses" />
+                    </div>
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-0 shadow-xl">
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectContent className="bg-white border border-purple-200 shadow-2xl rounded-xl">
+                    <SelectItem
+                      value="all"
+                      className="hover:bg-purple-50 focus:bg-purple-50 cursor-pointer py-3"
+                    >
+                      <div className="flex items-center gap-3 text-black">
+                        <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-bold text-purple-700">
+                            A
+                          </span>
+                        </div>
+                        <span className="font-medium">All Statuses</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem
+                      value="active"
+                      className="hover:bg-purple-50 focus:bg-purple-50 cursor-pointer py-3"
+                    >
+                      <div className="flex items-center gap-3 text-black">
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                          <CheckCircle2 className="h-3 w-3 text-green-600" />
+                        </div>
+                        <span className="font-medium">Active</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem
+                      value="inactive"
+                      className="hover:bg-purple-50 focus:bg-purple-50 cursor-pointer py-3"
+                    >
+                      <div className="flex items-center gap-3 text-black">
+                        <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                          <XCircle className="h-3 w-3 text-red-600" />
+                        </div>
+                        <span className="font-medium">Inactive</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1485,12 +2104,48 @@ function StudentManagementContent() {
                   School
                 </Label>
                 <Select value={schoolFilter} onValueChange={setSchoolFilter}>
-                  <SelectTrigger className="h-12 border-2 border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900">
-                    <SelectValue placeholder="All schools" />
+                  <SelectTrigger className="h-14 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 hover:border-orange-300 hover:shadow-lg transition-all duration-300 rounded-xl text-slate-900 font-medium">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-orange-100 rounded-lg">
+                        <School className="h-4 w-4 text-orange-600" />
+                      </div>
+                      <SelectValue placeholder="All schools" />
+                    </div>
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-0 shadow-xl">
-                    <SelectItem value="all">All Schools</SelectItem>
-                    {/* School options will be populated from API */}
+                  <SelectContent className="bg-white border border-orange-200 shadow-2xl rounded-xl max-h-60 overflow-y-auto">
+                    <SelectItem
+                      value="all"
+                      className="hover:bg-orange-50 focus:bg-orange-50 cursor-pointer py-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                          <School className="h-4 w-4 text-orange-600" />
+                        </div>
+                        <span className="font-medium">All Schools</span>
+                      </div>
+                    </SelectItem>
+                    {schools.map((school) => (
+                      <SelectItem
+                        key={school.id}
+                        value={school.id}
+                        className="hover:bg-orange-50 focus:bg-orange-50 cursor-pointer py-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <School className="h-4 w-4 text-orange-600" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-gray-900">
+                              {school.name}
+                            </span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {school.city}, {school.state}
+                            </span>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -1514,14 +2169,51 @@ function StudentManagementContent() {
                       Tag Status
                     </Label>
                     <Select value={tagFilter} onValueChange={setTagFilter}>
-                      <SelectTrigger className="h-12 border-2 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900">
-                        <SelectValue placeholder="All tag statuses" />
+                      <SelectTrigger className="h-14 bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 hover:border-indigo-300 hover:shadow-lg transition-all duration-300 rounded-xl text-slate-900 font-medium">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-indigo-100 rounded-lg">
+                            <Shield className="h-4 w-4 text-indigo-600" />
+                          </div>
+                          <SelectValue placeholder="All tag statuses" />
+                        </div>
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border-0 shadow-xl">
-                        <SelectItem value="all">All Tag Statuses</SelectItem>
-                        <SelectItem value="with-tags">With Tags</SelectItem>
-                        <SelectItem value="without-tags">
-                          Without Tags
+                      <SelectContent className="bg-white border border-indigo-200 shadow-2xl rounded-xl">
+                        <SelectItem
+                          value="all"
+                          className="hover:bg-indigo-50 focus:bg-indigo-50 cursor-pointer py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
+                              <span className="text-xs font-bold text-indigo-700">
+                                A
+                              </span>
+                            </div>
+                            <span className="font-medium">
+                              All Tag Statuses
+                            </span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem
+                          value="with-tags"
+                          className="hover:bg-indigo-50 focus:bg-indigo-50 cursor-pointer py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                              <CheckCircle2 className="h-3 w-3 text-green-600" />
+                            </div>
+                            <span className="font-medium">With Tags</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem
+                          value="without-tags"
+                          className="hover:bg-indigo-50 focus:bg-indigo-50 cursor-pointer py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                              <XCircle className="h-3 w-3 text-red-600" />
+                            </div>
+                            <span className="font-medium">Without Tags</span>
+                          </div>
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -1561,17 +2253,58 @@ function StudentManagementContent() {
                       Sort By
                     </Label>
                     <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="h-12 border-2 border-slate-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all duration-300 rounded-xl bg-white/90 backdrop-blur-sm text-slate-900">
-                        <SelectValue placeholder="Sort by" />
+                      <SelectTrigger className="h-14 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 rounded-xl text-slate-900 font-medium">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-emerald-100 rounded-lg">
+                            <Settings className="h-4 w-4 text-emerald-600" />
+                          </div>
+                          <SelectValue placeholder="Sort by" />
+                        </div>
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border-0 shadow-xl">
-                        <SelectItem value="name">Name</SelectItem>
-                        <SelectItem value="grade">Grade</SelectItem>
-                        <SelectItem value="dateOfBirth">
-                          Date of Birth
+                      <SelectContent className="bg-white border border-emerald-200 shadow-2xl rounded-xl">
+                        <SelectItem
+                          value="name"
+                          className="hover:bg-emerald-50 focus:bg-emerald-50 cursor-pointer py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                              <User className="h-3 w-3 text-emerald-600" />
+                            </div>
+                            <span className="font-medium">Name</span>
+                          </div>
                         </SelectItem>
-                        <SelectItem value="createdAt">
-                          Enrollment Date
+                        <SelectItem
+                          value="grade"
+                          className="hover:bg-emerald-50 focus:bg-emerald-50 cursor-pointer py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                              <BookOpen className="h-3 w-3 text-emerald-600" />
+                            </div>
+                            <span className="font-medium">Grade</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem
+                          value="dateOfBirth"
+                          className="hover:bg-emerald-50 focus:bg-emerald-50 cursor-pointer py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                              <Calendar className="h-3 w-3 text-emerald-600" />
+                            </div>
+                            <span className="font-medium">Date of Birth</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem
+                          value="createdAt"
+                          className="hover:bg-emerald-50 focus:bg-emerald-50 cursor-pointer py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                              <Clock className="h-3 w-3 text-emerald-600" />
+                            </div>
+                            <span className="font-medium">Enrollment Date</span>
+                          </div>
                         </SelectItem>
                       </SelectContent>
                     </Select>

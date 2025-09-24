@@ -134,7 +134,7 @@ export class StudentService {
       data: {
         firstName,
         lastName,
-        dateOfBirth,
+        dateOfBirth: new Date(dateOfBirth),
         grade,
         studentId,
         rfidTag,
