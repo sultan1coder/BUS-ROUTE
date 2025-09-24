@@ -34,6 +34,22 @@ import {
   Sun,
   Moon,
   Monitor,
+  GraduationCap,
+  FileText,
+  AlertTriangle,
+  TrendingUp,
+  UserPlus,
+  UserMinus,
+  UserCog,
+  Map,
+  Navigation,
+  ChartBar,
+  PieChart,
+  Activity,
+  AlertCircle,
+  Camera,
+  Clock,
+  Phone,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/auth-context";
@@ -60,14 +76,152 @@ const navigation: NavItem[] = [
   },
   {
     title: "User Management",
-    href: "/admin/users",
     icon: Users,
-    badge: "New",
+    children: [
+      {
+        title: "All Users",
+        href: "/admin/users",
+        icon: Users,
+      },
+      {
+        title: "Add User",
+        href: "/admin/users/add",
+        icon: UserPlus,
+      },
+      {
+        title: "Admin Users",
+        href: "/admin/users/admins",
+        icon: Shield,
+      },
+      {
+        title: "School Staff",
+        href: "/admin/users/staff",
+        icon: UserCheck,
+      },
+      {
+        title: "Parents",
+        href: "/admin/users/parents",
+        icon: UserCog,
+      },
+      {
+        title: "User Roles",
+        href: "/admin/users/roles",
+        icon: Settings,
+      },
+      {
+        title: "User Permissions",
+        href: "/admin/users/permissions",
+        icon: Shield,
+      },
+      {
+        title: "User Activity",
+        href: "/admin/users/activity",
+        icon: Activity,
+      },
+    ],
   },
   {
     title: "Driver Management",
-    href: "/admin/drivers",
     icon: UserCheck,
+    children: [
+      {
+        title: "All Drivers",
+        href: "/admin/drivers",
+        icon: UserCheck,
+      },
+      {
+        title: "Add Driver",
+        href: "/admin/drivers/add",
+        icon: UserPlus,
+      },
+      {
+        title: "Driver Licenses",
+        href: "/admin/drivers/licenses",
+        icon: FileText,
+      },
+      {
+        title: "Driver Training",
+        href: "/admin/drivers/training",
+        icon: GraduationCap,
+      },
+      {
+        title: "Driver Performance",
+        href: "/admin/drivers/performance",
+        icon: BarChart3,
+      },
+      {
+        title: "Driver Schedule",
+        href: "/admin/drivers/schedule",
+        icon: Clock,
+      },
+      {
+        title: "Driver Reports",
+        href: "/admin/drivers/reports",
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    title: "Student Management",
+    icon: GraduationCap,
+    children: [
+      {
+        title: "All Students",
+        href: "/admin/students",
+        icon: Users,
+      },
+      {
+        title: "Add Student",
+        href: "/admin/students/add",
+        icon: UserPlus,
+      },
+      {
+        title: "Student Attendance",
+        href: "/admin/students/attendance",
+        icon: Clock,
+      },
+      {
+        title: "Student Reports",
+        href: "/admin/students/reports",
+        icon: FileText,
+      },
+      {
+        title: "Parent Management",
+        href: "/admin/students/parents",
+        icon: UserCog,
+      },
+    ],
+  },
+  {
+    title: "Route Management",
+    icon: Route,
+    children: [
+      {
+        title: "All Routes",
+        href: "/admin/routes",
+        icon: Route,
+      },
+      {
+        title: "Create Route",
+        href: "/admin/routes/create",
+        icon: Navigation,
+      },
+      {
+        title: "Route Stops",
+        href: "/admin/routes/stops",
+        icon: MapPin,
+      },
+      {
+        title: "Route Optimization",
+        href: "/admin/routes/optimization",
+        icon: TrendingUp,
+      },
+      {
+        title: "Route Analytics",
+        href: "/admin/routes/analytics",
+        icon: BarChart3,
+      },
+    ],
   },
   {
     title: "Bus Management",
@@ -79,34 +233,91 @@ const navigation: NavItem[] = [
         icon: Bus,
       },
       {
-        title: "Bus Routes",
-        href: "/admin/routes",
-        icon: Route,
-      },
-      {
         title: "GPS Tracking",
         href: "/admin/tracking",
         icon: MapPin,
       },
+      {
+        title: "Bus Maintenance",
+        href: "/admin/buses/maintenance",
+        icon: Settings,
+      },
+      {
+        title: "Driver Assignment",
+        href: "/admin/buses/drivers",
+        icon: UserCheck,
+      },
     ],
   },
   {
-    title: "Analytics",
+    title: "Reports & Analytics",
     icon: BarChart3,
     children: [
       {
-        title: "User Analytics",
-        href: "/admin/analytics/users",
-        icon: Users,
+        title: "Dashboard Analytics",
+        href: "/admin/analytics/dashboard",
+        icon: ChartBar,
       },
       {
-        title: "Route Analytics",
+        title: "Student Reports",
+        href: "/admin/analytics/students",
+        icon: GraduationCap,
+      },
+      {
+        title: "Route Reports",
         href: "/admin/analytics/routes",
         icon: Route,
       },
       {
+        title: "Attendance Reports",
+        href: "/admin/analytics/attendance",
+        icon: Clock,
+      },
+      {
         title: "Safety Reports",
         href: "/admin/analytics/safety",
+        icon: Shield,
+      },
+      {
+        title: "Performance Metrics",
+        href: "/admin/analytics/performance",
+        icon: Activity,
+      },
+    ],
+  },
+  {
+    title: "Alerts & Safety",
+    icon: AlertTriangle,
+    children: [
+      {
+        title: "Active Alerts",
+        href: "/admin/alerts",
+        icon: AlertCircle,
+        badge: "2",
+      },
+      {
+        title: "Safety Incidents",
+        href: "/admin/safety/incidents",
+        icon: AlertTriangle,
+      },
+      {
+        title: "Emergency Contacts",
+        href: "/admin/safety/emergency",
+        icon: Phone,
+      },
+      {
+        title: "Safety Guidelines",
+        href: "/admin/safety/guidelines",
+        icon: FileText,
+      },
+      {
+        title: "Camera Monitoring",
+        href: "/admin/safety/cameras",
+        icon: Camera,
+      },
+      {
+        title: "Safety Reports",
+        href: "/admin/safety/reports",
         icon: Shield,
       },
     ],
