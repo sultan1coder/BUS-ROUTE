@@ -114,6 +114,99 @@ router.get(
   AdminController.getAllBuses
 );
 
+router.post("/buses", handleValidationErrors, AdminController.createBus);
+
+router.get(
+  "/buses/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.getBusById
+);
+
+router.put(
+  "/buses/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.updateBus
+);
+
+router.delete(
+  "/buses/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.deleteBus
+);
+
+// Bus maintenance
+router.get(
+  "/buses/maintenance",
+  validatePagination,
+  handleValidationErrors,
+  AdminController.getMaintenanceRecords
+);
+
+router.post(
+  "/buses/maintenance",
+  handleValidationErrors,
+  AdminController.createMaintenanceRecord
+);
+
+router.put(
+  "/buses/maintenance/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.updateMaintenanceRecord
+);
+
+router.delete(
+  "/buses/maintenance/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.deleteMaintenanceRecord
+);
+
+router.get(
+  "/buses/:id/maintenance",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.getBusMaintenance
+);
+
+router.get(
+  "/buses/:id/trips",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.getBusTrips
+);
+
+// Bus driver assignments
+router.get(
+  "/buses/driver-assignments",
+  validatePagination,
+  handleValidationErrors,
+  AdminController.getBusDriverAssignments
+);
+
+router.post(
+  "/buses/driver-assignments",
+  handleValidationErrors,
+  AdminController.createBusDriverAssignment
+);
+
+router.put(
+  "/buses/driver-assignments/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.updateBusDriverAssignment
+);
+
+router.delete(
+  "/buses/driver-assignments/:id",
+  validateUUID,
+  handleValidationErrors,
+  AdminController.deleteBusDriverAssignment
+);
+
 // School management
 router.get(
   "/schools",

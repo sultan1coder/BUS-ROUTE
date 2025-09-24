@@ -916,6 +916,245 @@ export class AdminApiService {
       };
     }
   }
+
+  // Bus Management APIs
+  static async getBuses() {
+    try {
+      const response = await api.get("/admin/buses");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch buses:", error);
+      throw error;
+    }
+  }
+
+  static async getBusById(busId: string) {
+    try {
+      const response = await api.get(`/admin/buses/${busId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch bus:", error);
+      throw error;
+    }
+  }
+
+  static async createBus(busData: {
+    plateNumber: string;
+    model: string;
+    capacity: number;
+    schoolId: string;
+    driverId?: string;
+    isActive: boolean;
+  }) {
+    try {
+      const response = await api.post("/admin/buses", busData);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create bus:", error);
+      throw error;
+    }
+  }
+
+  static async updateBus(
+    busId: string,
+    busData: {
+      plateNumber: string;
+      model: string;
+      capacity: number;
+      schoolId: string;
+      driverId?: string;
+      isActive: boolean;
+    }
+  ) {
+    try {
+      const response = await api.put(`/admin/buses/${busId}`, busData);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update bus:", error);
+      throw error;
+    }
+  }
+
+  static async deleteBus(busId: string) {
+    try {
+      const response = await api.delete(`/admin/buses/${busId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to delete bus:", error);
+      throw error;
+    }
+  }
+
+  static async getSchools() {
+    try {
+      const response = await api.get("/admin/schools");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch schools:", error);
+      throw error;
+    }
+  }
+
+  static async getDrivers() {
+    try {
+      const response = await api.get("/drivers");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch drivers:", error);
+      throw error;
+    }
+  }
+
+  // Bus Maintenance APIs
+  static async getMaintenanceRecords() {
+    try {
+      const response = await api.get("/buses/maintenance");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch maintenance records:", error);
+      throw error;
+    }
+  }
+
+  static async createMaintenanceRecord(recordData: {
+    busId: string;
+    date: Date;
+    type: string;
+    description: string;
+    cost: number;
+    mileage: number;
+    nextService: Date;
+    status: string;
+    technician: string;
+    notes: string;
+  }) {
+    try {
+      const response = await api.post("/buses/maintenance", recordData);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create maintenance record:", error);
+      throw error;
+    }
+  }
+
+  static async updateMaintenanceRecord(
+    recordId: string,
+    recordData: {
+      busId: string;
+      date: Date;
+      type: string;
+      description: string;
+      cost: number;
+      mileage: number;
+      nextService: Date;
+      status: string;
+      technician: string;
+      notes: string;
+    }
+  ) {
+    try {
+      const response = await api.put(
+        `/buses/maintenance/${recordId}`,
+        recordData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update maintenance record:", error);
+      throw error;
+    }
+  }
+
+  static async deleteMaintenanceRecord(recordId: string) {
+    try {
+      const response = await api.delete(`/buses/maintenance/${recordId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to delete maintenance record:", error);
+      throw error;
+    }
+  }
+
+  static async getBusMaintenance(busId: string) {
+    try {
+      const response = await api.get(`/buses/${busId}/maintenance`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch bus maintenance:", error);
+      throw error;
+    }
+  }
+
+  static async getBusTrips(busId: string) {
+    try {
+      const response = await api.get(`/buses/${busId}/trips`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch bus trips:", error);
+      throw error;
+    }
+  }
+
+  // Bus Driver Assignment APIs
+  static async getBusDriverAssignments() {
+    try {
+      const response = await api.get("/buses/driver-assignments");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch driver assignments:", error);
+      throw error;
+    }
+  }
+
+  static async createBusDriverAssignment(assignmentData: {
+    busId: string;
+    driverId: string;
+    isActive: boolean;
+    notes: string;
+  }) {
+    try {
+      const response = await api.post(
+        "/buses/driver-assignments",
+        assignmentData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create driver assignment:", error);
+      throw error;
+    }
+  }
+
+  static async updateBusDriverAssignment(
+    assignmentId: string,
+    assignmentData: {
+      busId: string;
+      driverId: string;
+      isActive: boolean;
+      notes: string;
+    }
+  ) {
+    try {
+      const response = await api.put(
+        `/buses/driver-assignments/${assignmentId}`,
+        assignmentData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update driver assignment:", error);
+      throw error;
+    }
+  }
+
+  static async deleteBusDriverAssignment(assignmentId: string) {
+    try {
+      const response = await api.delete(
+        `/buses/driver-assignments/${assignmentId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to delete driver assignment:", error);
+      throw error;
+    }
+  }
 }
 
 // Export individual functions for convenience

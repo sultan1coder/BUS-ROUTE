@@ -163,6 +163,7 @@ model Driver {
   performance       DriverPerformance[]
   emergencyAlerts   EmergencyAlert[]
   speedViolations   SpeedViolation[]
+  busAssignments    BusDriverAssignment[]
 
   @@map("drivers")
 }
@@ -193,6 +194,8 @@ model Bus {
   geofences       Geofence[]
   emergencyAlerts EmergencyAlert[]
   speedViolations SpeedViolation[]
+  maintenanceRecords MaintenanceRecord[]
+  driverAssignments BusDriverAssignment[]
 
   @@map("buses")
 }
@@ -517,4 +520,46 @@ model SpeedViolation {
 
   @@index([busId, timestamp])
   @@map("speed_violations")
+}
+
+// Maintenance record model
+model MaintenanceRecord {
+  id          String   @id @default(cuid())
+  busId       String
+  date        DateTime
+  type        String   // Oil Change, Brake Service, Engine Repair, etc.
+  description String
+  cost        Float
+  mileage     Int
+  nextService DateTime
+  status      String   // Pending, In Progress, Completed, Cancelled
+  technician  String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  bus         Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+
+  @@index([busId, date])
+  @@map("maintenance_records")
+}
+
+// Bus driver assignment model
+model BusDriverAssignment {
+  id         String   @id @default(cuid())
+  busId      String
+  driverId   String
+  isActive   Boolean  @default(true)
+  notes      String?
+  assignedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  bus        Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+  driver     Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@unique([busId, driverId])
+  @@map("bus_driver_assignments")
 }

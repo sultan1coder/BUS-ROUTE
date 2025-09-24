@@ -807,4 +807,548 @@ export class AdminController {
       });
     }
   );
+
+  // Bus Management Methods
+  static createBus = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { plateNumber, model, capacity, schoolId, driverId, isActive } =
+        req.body;
+
+      const bus = await prisma.bus.create({
+        data: {
+          plateNumber,
+          model,
+          capacity: parseInt(capacity),
+          year: new Date().getFullYear(), // Default to current year
+          color: "White", // Default color
+          schoolId,
+          driverId: driverId || null,
+          isActive: isActive !== false,
+        },
+        include: {
+          school: true,
+          driver: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      res.status(201).json({
+        success: true,
+        data: bus,
+        message: "Bus created successfully",
+      });
+    }
+  );
+
+  static getBusById = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+
+      const bus = await prisma.bus.findUnique({
+        where: { id },
+        include: {
+          school: true,
+          driver: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  phone: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          routes: {
+            include: {
+              stops: true,
+            },
+          },
+        },
+      });
+
+      if (!bus) {
+        res.status(404).json({
+          success: false,
+          message: "Bus not found",
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: bus,
+      });
+    }
+  );
+
+  static updateBus = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+      const { plateNumber, model, capacity, schoolId, driverId, isActive } =
+        req.body;
+
+      const bus = await prisma.bus.update({
+        where: { id },
+        data: {
+          plateNumber,
+          model,
+          capacity: parseInt(capacity),
+          schoolId,
+          driverId: driverId || null,
+          isActive: isActive !== false,
+        },
+        include: {
+          school: true,
+          driver: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      res.status(200).json({
+        success: true,
+        data: bus,
+        message: "Bus updated successfully",
+      });
+    }
+  );
+
+  static deleteBus = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+
+      await prisma.bus.delete({
+        where: { id },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Bus deleted successfully",
+      });
+    }
+  );
+
+  // Maintenance Records
+  static getMaintenanceRecords = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<PaginatedResponse<any>>
+    ): Promise<void> => {
+      const { page = 1, limit = 20, busId, status, type } = req.query;
+
+      const where: any = {};
+      if (busId) where.busId = busId as string;
+      if (status) where.status = status as string;
+      if (type) where.type = type as string;
+
+      const [records, total] = await Promise.all([
+        prisma.maintenanceRecord.findMany({
+          where,
+          include: {
+            bus: {
+              select: {
+                id: true,
+                plateNumber: true,
+                model: true,
+              },
+            },
+          },
+          orderBy: { date: "desc" },
+          skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+          take: parseInt(limit as string),
+        }),
+        prisma.maintenanceRecord.count({ where }),
+      ]);
+
+      const totalPages = Math.ceil(total / parseInt(limit as string));
+
+      res.status(200).json({
+        success: true,
+        data: records,
+        meta: {
+          page: parseInt(page as string),
+          limit: parseInt(limit as string),
+          total,
+          totalPages,
+        },
+      });
+    }
+  );
+
+  static createMaintenanceRecord = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const {
+        busId,
+        date,
+        type,
+        description,
+        cost,
+        mileage,
+        nextService,
+        status,
+        technician,
+        notes,
+      } = req.body;
+
+      const record = await prisma.maintenanceRecord.create({
+        data: {
+          busId,
+          date: new Date(date),
+          type,
+          description,
+          cost: parseFloat(cost),
+          mileage: parseInt(mileage),
+          nextService: new Date(nextService),
+          status,
+          technician,
+          notes,
+        },
+        include: {
+          bus: {
+            select: {
+              id: true,
+              plateNumber: true,
+              model: true,
+            },
+          },
+        },
+      });
+
+      res.status(201).json({
+        success: true,
+        data: record,
+        message: "Maintenance record created successfully",
+      });
+    }
+  );
+
+  static updateMaintenanceRecord = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+      const {
+        busId,
+        date,
+        type,
+        description,
+        cost,
+        mileage,
+        nextService,
+        status,
+        technician,
+        notes,
+      } = req.body;
+
+      const record = await prisma.maintenanceRecord.update({
+        where: { id },
+        data: {
+          busId,
+          date: new Date(date),
+          type,
+          description,
+          cost: parseFloat(cost),
+          mileage: parseInt(mileage),
+          nextService: new Date(nextService),
+          status,
+          technician,
+          notes,
+        },
+        include: {
+          bus: {
+            select: {
+              id: true,
+              plateNumber: true,
+              model: true,
+            },
+          },
+        },
+      });
+
+      res.status(200).json({
+        success: true,
+        data: record,
+        message: "Maintenance record updated successfully",
+      });
+    }
+  );
+
+  static deleteMaintenanceRecord = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+
+      await prisma.maintenanceRecord.delete({
+        where: { id },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Maintenance record deleted successfully",
+      });
+    }
+  );
+
+  static getBusMaintenance = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+
+      const records = await prisma.maintenanceRecord.findMany({
+        where: { busId: id },
+        orderBy: { date: "desc" },
+      });
+
+      res.status(200).json({
+        success: true,
+        data: records,
+      });
+    }
+  );
+
+  static getBusTrips = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+
+      // Mock trip data for now
+      const trips = [
+        {
+          id: "1",
+          date: new Date(),
+          route: "Route A",
+          driver: "John Doe",
+          startTime: "08:00",
+          endTime: "09:00",
+          students: 25,
+          status: "Completed",
+        },
+      ];
+
+      res.status(200).json({
+        success: true,
+        data: trips,
+      });
+    }
+  );
+
+  // Bus Driver Assignments
+  static getBusDriverAssignments = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<PaginatedResponse<any>>
+    ): Promise<void> => {
+      const { page = 1, limit = 20, busId, driverId, isActive } = req.query;
+
+      const where: any = {};
+      if (busId) where.busId = busId as string;
+      if (driverId) where.driverId = driverId as string;
+      if (isActive !== undefined) where.isActive = isActive === "true";
+
+      const [assignments, total] = await Promise.all([
+        prisma.busDriverAssignment.findMany({
+          where,
+          include: {
+            bus: {
+              select: {
+                id: true,
+                plateNumber: true,
+                model: true,
+                school: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+            driver: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    phone: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: { assignedAt: "desc" },
+          skip: (parseInt(page as string) - 1) * parseInt(limit as string),
+          take: parseInt(limit as string),
+        }),
+        prisma.busDriverAssignment.count({ where }),
+      ]);
+
+      const totalPages = Math.ceil(total / parseInt(limit as string));
+
+      res.status(200).json({
+        success: true,
+        data: assignments,
+        meta: {
+          page: parseInt(page as string),
+          limit: parseInt(limit as string),
+          total,
+          totalPages,
+        },
+      });
+    }
+  );
+
+  static createBusDriverAssignment = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { busId, driverId, isActive, notes } = req.body;
+
+      const assignment = await prisma.busDriverAssignment.create({
+        data: {
+          busId,
+          driverId,
+          isActive: isActive !== false,
+          notes,
+          assignedAt: new Date(),
+        },
+        include: {
+          bus: {
+            select: {
+              id: true,
+              plateNumber: true,
+              model: true,
+            },
+          },
+          driver: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      res.status(201).json({
+        success: true,
+        data: assignment,
+        message: "Driver assignment created successfully",
+      });
+    }
+  );
+
+  static updateBusDriverAssignment = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+      const { busId, driverId, isActive, notes } = req.body;
+
+      const assignment = await prisma.busDriverAssignment.update({
+        where: { id },
+        data: {
+          busId,
+          driverId,
+          isActive: isActive !== false,
+          notes,
+        },
+        include: {
+          bus: {
+            select: {
+              id: true,
+              plateNumber: true,
+              model: true,
+            },
+          },
+          driver: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      res.status(200).json({
+        success: true,
+        data: assignment,
+        message: "Driver assignment updated successfully",
+      });
+    }
+  );
+
+  static deleteBusDriverAssignment = asyncHandler(
+    async (
+      req: AuthenticatedRequest,
+      res: Response<ApiResponse>
+    ): Promise<void> => {
+      const { id } = req.params;
+
+      await prisma.busDriverAssignment.delete({
+        where: { id },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Driver assignment deleted successfully",
+      });
+    }
+  );
 }
