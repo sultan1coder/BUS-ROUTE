@@ -289,44 +289,65 @@ export function Sidebar({ className }: SidebarProps) {
         {/* Theme Toggle */}
         {!isCollapsed && (
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                Theme
-              </span>
-              <div className="flex items-center space-x-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTheme("light")}
-                  className={cn(
-                    "h-8 w-8 p-0 cursor-pointer",
-                    theme === "light" && "bg-gray-100 dark:bg-gray-800"
-                  )}
-                >
-                  <Sun className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTheme("dark")}
-                  className={cn(
-                    "h-8 w-8 p-0 cursor-pointer",
-                    theme === "dark" && "bg-gray-100 dark:bg-gray-800"
-                  )}
-                >
-                  <Moon className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTheme("system")}
-                  className={cn(
-                    "h-8 w-8 p-0 cursor-pointer",
-                    theme === "system" && "bg-gray-100 dark:bg-gray-800"
-                  )}
-                >
-                  <Monitor className="h-4 w-4" />
-                </Button>
+            <div className="bg-gradient-to-r from-slate-50 to-gray-100 dark:from-slate-800 dark:to-gray-900 rounded-xl p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Theme
+                </span>
+                <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-inner">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setTheme("light")}
+                    className={cn(
+                      "h-8 w-8 p-0 cursor-pointer rounded-md transition-all duration-200",
+                      theme === "light"
+                        ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                    )}
+                    title="Light Mode"
+                  >
+                    <Sun className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setTheme("dark")}
+                    className={cn(
+                      "h-8 w-8 p-0 cursor-pointer rounded-md transition-all duration-200",
+                      theme === "dark"
+                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                    )}
+                    title="Dark Mode"
+                  >
+                    <Moon className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setTheme("system")}
+                    className={cn(
+                      "h-8 w-8 p-0 cursor-pointer rounded-md transition-all duration-200",
+                      theme === "system"
+                        ? "bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                    )}
+                    title="System Theme"
+                  >
+                    <Monitor className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span>
+                  {theme === "light" && "☀️ Light Mode Active"}
+                  {theme === "dark" && "🌙 Dark Mode Active"}
+                  {theme === "system" && "🖥️ System Theme Active"}
+                </span>
+                <span className="text-xs">
+                  {theme === "system" && "Follows OS preference"}
+                </span>
               </div>
             </div>
           </div>
